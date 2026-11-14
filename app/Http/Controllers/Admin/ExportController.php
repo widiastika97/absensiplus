@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\CutiKaryawan;
+use App\Models\JadwalLibur;
+use App\Models\Karyawan;
+use App\Models\Presensi;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * Export rekapitulasi matriks kehadiran ke Excel (.xls via HTML table)
+ * dan Print/PDF (HTML siap cetak dengan window.print).
+ */
+class ExportController extends Controller
+{
+    public function excel(Request $request): Response
+    {
+        $data = $this->buildMatrix($request);
+        $tanggalMulai = $data['tanggal_mulai'];
+        $tanggalSelesai = $data['tanggal_selesai'];
+
+        $filename = 'Rekap_Absensi_'.$tanggalMulai.'_sd_'.$tanggalSelesai.'.xls';
+
+        return response()
+            ->view('admin.exports.rekap-matrix', $data)
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename='.$filename)
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
+    }
+
+    public function pdf(Request $request): Response
+    {
+        $data = $this->buildMatrix($request);
+        $data['isPrint'] = true;
+
+        return response()->view('admin.exports.rekap-matrix', $data);
+    }
+
+    private function buildMatrix(Request $request): array
+    {
+        $tanggalMulai = $request->query('tanggal_mulai', $request->query('start_date', ''));
+        $tanggalSelesai = $request->query('tanggal_selesai', $request->query('end_date', ''));
+
+        // Backward compatibility: bulan & tahun
+        if ($request->filled(['bulan', 'tahun']) && empty($tanggalMulai)) {
+            $tanggalMulai = sprintf('%04d-%02d-01', (int) $request->query('tahun'), (int) $request->query('bulan'));
+            $tanggalSelesai = date('Y-m-t', strtotime($tanggalMulai));
+        }
+
+        $tanggalMulai = $tanggalMulai ?: now()->startOfMonth()->toDateString();
+        $tanggalSelesai = $tanggalSelesai ?: now()->toDateString();
+
+        if ($tanggalMulai > $tanggalSelesai) {
+            [$tanggalMulai, $tanggalSelesai] = [$tanggalSelesai, $tanggalMulai];
+        }
+
+        // Daftar tanggal
+        $daftarTanggal = [];
+        $cur = new \DateTime($tanggalMulai);
+        $end = new \DateTime($tanggalSelesai);
+        while ($cur <= $end) {
+            $daftarTanggal[] = $cur->format('Y-m-d');
+            $cur->modify('+1 day');
+        }
+
+        // Karyawan aktif
+        $karyawanList = Karyawan::where('is_active', 1)
+            ->orderBy('departemen')->orderBy('nama')
+            ->get(['id', 'nama', 'nip', 'departemen', 'jabatan']);
+
+        // Presensi dalam rentang tanggal
+        $presensiMap = [];
+        Presensi::whereDate('tanggal', '>=', $tanggalMulai)
+            ->whereDate('tanggal', '<=', $tanggalSelesai)
+            ->orderBy('tanggal')->orderBy('jam')
+            ->get(['karyawan_id', 'tanggal', 'tipe', 'jam', 'status', 'keterangan'])
+            ->each(function ($p) use (&$presensiMap) {
+                $presensiMap[$p->karyawan_id][$p->tanggal->toDateString()][$p->tipe] = $p;
+            });
+
+        // Cuti approved
+        $cutiMap = [];
+        CutiKaryawan::where('status', 'approved')
+            ->whereDate('tanggal_mulai', '<=', $tanggalSelesai)
+            ->whereDate('tanggal_selesai', '>=', $tanggalMulai)
+            ->get(['karyawan_id', 'label_tipe', 'tanggal_mulai', 'tanggal_selesai'])
+            ->each(function ($c) use (&$cutiMap, $tanggalMulai, $tanggalSelesai) {
+                $start = max($c->tanggal_mulai->toDateString(), $tanggalMulai);
+                $endC = min($c->tanggal_selesai->toDateString(), $tanggalSelesai);
+                $cur = new \DateTime($start);
+                $endD = new \DateTime($endC);
+                while ($cur <= $endD) {
+                    $cutiMap[$c->karyawan_id][$cur->format('Y-m-d')] = $c->label_tipe ?: 'Cuti';
+                    $cur->modify('+1 day');
+                }
+            });
+
+        // Libur nasional
+        $liburMap = [];
+        JadwalLibur::whereDate('tanggal_mulai', '<=', $tanggalSelesai)
+            ->whereDate('tanggal_selesai', '>=', $tanggalMulai)
+            ->get(['nama_libur', 'tanggal_mulai', 'tanggal_selesai'])
+            ->each(function ($l) use (&$liburMap, $tanggalMulai, $tanggalSelesai) {
+                $start = max($l->tanggal_mulai->toDateString(), $tanggalMulai);
+                $endL = min($l->tanggal_selesai->toDateString(), $tanggalSelesai);
+                $cur = new \DateTime($start);
+                $endD = new \DateTime($endL);
+                while ($cur <= $endD) {
+                    $liburMap[$cur->format('Y-m-d')] = $l->nama_libur;
+                    $cur->modify('+1 day');
+                }
+            });
+
+        return [
+            'daftarTanggal' => $daftarTanggal,
+            'karyawanList' => $karyawanList,
+            'presensiMap' => $presensiMap,
+            'cutiMap' => $cutiMap,
+            'liburMap' => $liburMap,
+            'tanggal_mulai' => $tanggalMulai,
+            'tanggal_selesai' => $tanggalSelesai,
+            'today' => now()->toDateString(),
+            'isPrint' => false,
+        ];
+    }
+}
