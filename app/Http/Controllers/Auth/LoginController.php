@@ -84,6 +84,13 @@ class LoginController extends Controller
         return redirect()->route('login');
     }
 
+    public static function redirectTargetAfterLogin(Request $request): string
+    {
+        $user = $request->user('karyawan');
+
+        return $user ? (new self)->redirectBasedOnRole($user) : route('login');
+    }
+
     private function redirectBasedOnRole(Karyawan $user): string
     {
         return $user->isAdmin() || (int) $user->role_id === 1

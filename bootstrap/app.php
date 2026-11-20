@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+
+        // Redirect pengguna yang sudah login ke dashboard sesuai role,
+        // bukan '/' (default framework) yang menyebabkan redirect loop.
+        $middleware->redirectUsersTo(
+            fn (\Illuminate\Http\Request $request) => LoginController::redirectTargetAfterLogin($request)
+        );
 
         $middleware->alias([
             'permission' => \App\Http\Middleware\CheckPermission::class,
