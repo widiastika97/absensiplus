@@ -143,24 +143,24 @@ class CrudShiftController extends Controller
             $query = Karyawan::where('is_active', 1);
 
             if ($jenis !== 'semua') {
-                $kodeRole = $jenis === 'tetap' ? 'ROLE_GURU_TETAP' : 'ROLE_GURU_KONTRAK';
-                $roleId = Role::where('kode_role', $kodeRole)->value('id');
-                if (! $roleId) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Role '.$kodeRole.' tidak ditemukan!',
-                    ], 422);
-                }
-                $query->where('role_id', $roleId);
+                // Cocokkan jenis ke kode/nama role (mis. ROLE_GURU_TETAP, Karyawan Kontrak, dll.)
+                $query->whereHas('role', function ($r) use ($jenis) {
+                    $kata = $jenis === 'tetap' ? 'tetap' : 'kontrak';
+                    $r->where('kode_role', 'like', '%'.$kata.'%')
+                        ->orWhere('nama_role', 'like', '%'.$kata.'%');
+                });
             }
 
             $karyawanIds = $query->pluck('id')->toArray();
         }
 
         if (empty($karyawanIds)) {
+            $pesanJenis = $jenis !== 'semua'
+                ? ' Tidak ada karyawan aktif dengan jenis '.($jenis === 'tetap' ? 'karyawan tetap' : 'karyawan kontrak').' yang ditemukan.'
+                : '';
             return response()->json([
                 'status' => 'error',
-                'message' => 'Tidak ada data karyawan aktif yang ditemukan untuk digenerate jadwalnya!',
+                'message' => 'Tidak ada data karyawan aktif yang ditemukan untuk digenerate jadwalnya!'.$pesanJenis,
             ], 422);
         }
 
@@ -212,21 +212,22 @@ class CrudShiftController extends Controller
         $jamMasuk = $request->input('jam_masuk') ?? $request->input('jam_tetap_masuk');
         if ($jamMasuk) {
             $kodeRoles = match ($jenis) {
-                'tetap' => ['ROLE_GURU_TETAP'],
-                'kontrak' => ['ROLE_GURU_KONTRAK'],
-                default => ['ROLE_GURU_TETAP', 'ROLE_GURU_KONTRAK'],
+                'tetap' => ['TETAP'],
+                'kontrak' => ['KONTRAK'],
+                default => ['TETAP', 'KONTRAK'],
             };
 
-            foreach ($kodeRoles as $kode) {
-                $roleId = Role::where('kode_role', $kode)->value('id');
-                if (! $roleId) {
-                    continue;
+            $roleIds = Role::where(function ($r) use ($kodeRoles) {
+                foreach ($kodeRoles as $kata) {
+                    $r->orWhere('kode_role', 'like', '%'.$kata.'%')
+                        ->orWhere('nama_role', 'like', '%'.$kata.'%');
                 }
-                Karyawan::where('role_id', $roleId)->update([
-                    'jam_masuk' => $jamMasuk.':00',
-                    'jam_pulang' => ($request->input('jam_pulang') ?? $request->input('jam_tetap_pulang', '14:30')).':00',
-                ]);
-            }
+            })->pluck('id');
+
+            Karyawan::whereIn('role_id', $roleIds)->update([
+                'jam_masuk' => $jamMasuk.':00',
+                'jam_pulang' => ($request->input('jam_pulang') ?? $request->input('jam_tetap_pulang', '14:30')).':00',
+            ]);
         }
 
         return response()->json([
