@@ -86,21 +86,21 @@ class Karyawan extends Authenticatable
     }
 
     /**
-     * Kode role jenis guru (Tetap/Kontrak/Honor) bila role ini adalah guru.
+     * Kode role jenis karyawan (Tetap/Kontrak/Honor).
      */
-    public function kodeRoleGuru(): ?string
+    public function kodeRoleJenis(): ?string
     {
         $kode = $this->role?->kode_role;
 
-        return array_key_exists($kode, RoleSeeder::JAM_KERJA_GURU) ? $kode : null;
+        return array_key_exists($kode, RoleSeeder::JAM_KERJA_JENIS) ? $kode : null;
     }
 
     /**
-     * Jam kerja efektif guru sesuai tipe (via role); NULL jika custom/honor.
+     * Jam kerja efektif sesuai tipe (via role); NULL jika custom.
      */
-    public function jamKerjaGuru(): ?array
+    public function jamKerjaJenis(): ?array
     {
-        return Pengaturan::jamKerjaGuru($this->kodeRoleGuru());
+        return Pengaturan::jamKerjaJenis($this->kodeRoleJenis());
     }
 
     /**

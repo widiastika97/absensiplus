@@ -21,22 +21,22 @@ class Pengaturan extends Model
     }
 
     /**
-     * Preset jam kerja guru dari pengaturan (fallback ke mapping RoleSeeder).
+     * Preset jam kerja dari pengaturan (fallback ke mapping RoleSeeder).
      */
-    public static function jamKerjaGuru(?string $kodeRoleGuru): ?array
+    public static function jamKerjaJenis(?string $kodeRoleJenis): ?array
     {
         $map = [
-            'ROLE_GURU_TETAP' => ['jam_guru_tetap_masuk', 'jam_guru_tetap_pulang'],
-            'ROLE_GURU_KONTRAK' => ['jam_guru_kontrak_masuk', 'jam_guru_kontrak_pulang'],
+            'ROLE_KARYAWAN_TETAP' => ['jam_karyawan_tetap_masuk', 'jam_karyawan_tetap_pulang'],
+            'ROLE_KARYAWAN_KONTRAK' => ['jam_karyawan_kontrak_masuk', 'jam_karyawan_kontrak_pulang'],
         ];
 
-        if (! isset($map[$kodeRoleGuru])) {
+        if (! isset($map[$kodeRoleJenis])) {
             return null;
         }
 
         return [
-            static::get($map[$kodeRoleGuru][0], '07:30'),
-            static::get($map[$kodeRoleGuru][1], '14:30'),
+            static::get($map[$kodeRoleJenis][0], '07:30'),
+            static::get($map[$kodeRoleJenis][1], '14:30'),
         ];
     }
 
@@ -46,8 +46,8 @@ class Pengaturan extends Model
     public static function mapJamPerRoleKode(): array
     {
         return [
-            'ROLE_GURU_TETAP' => ['masuk' => static::get('jam_guru_tetap_masuk', '07:30'), 'pulang' => static::get('jam_guru_tetap_pulang', '14:30')],
-            'ROLE_GURU_KONTRAK' => ['masuk' => static::get('jam_guru_kontrak_masuk', '07:15'), 'pulang' => static::get('jam_guru_kontrak_pulang', '15:00')],
+            'ROLE_KARYAWAN_TETAP' => ['masuk' => static::get('jam_karyawan_tetap_masuk', '07:30'), 'pulang' => static::get('jam_karyawan_tetap_pulang', '14:30')],
+            'ROLE_KARYAWAN_KONTRAK' => ['masuk' => static::get('jam_karyawan_kontrak_masuk', '07:15'), 'pulang' => static::get('jam_karyawan_kontrak_pulang', '15:00')],
         ];
     }
 }

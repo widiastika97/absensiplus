@@ -16,10 +16,10 @@ return new class extends Migration
         });
 
         \Illuminate\Support\Facades\DB::table('pengaturan')->insert([
-            ['kunci' => 'jam_guru_tetap_masuk', 'nilai' => '07:30'],
-            ['kunci' => 'jam_guru_tetap_pulang', 'nilai' => '14:30'],
-            ['kunci' => 'jam_guru_kontrak_masuk', 'nilai' => '07:15'],
-            ['kunci' => 'jam_guru_kontrak_pulang', 'nilai' => '15:00'],
+            ['kunci' => 'jam_karyawan_tetap_masuk', 'nilai' => '07:30'],
+            ['kunci' => 'jam_karyawan_tetap_pulang', 'nilai' => '14:30'],
+            ['kunci' => 'jam_karyawan_kontrak_masuk', 'nilai' => '07:15'],
+            ['kunci' => 'jam_karyawan_kontrak_pulang', 'nilai' => '15:00'],
         ]);
     }
 

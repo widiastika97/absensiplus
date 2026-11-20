@@ -143,7 +143,7 @@ class CrudShiftController extends Controller
             $query = Karyawan::where('is_active', 1);
 
             if ($jenis !== 'semua') {
-                // Cocokkan jenis ke kode/nama role (mis. ROLE_GURU_TETAP, Karyawan Kontrak, dll.)
+                // Cocokkan jenis ke kode/nama role (mis. ROLE_KARYAWAN_TETAP, Karyawan Kontrak, dll.)
                 $query->whereHas('role', function ($r) use ($jenis) {
                     $kata = $jenis === 'tetap' ? 'tetap' : 'kontrak';
                     $r->where('kode_role', 'like', '%'.$kata.'%')

@@ -54,7 +54,7 @@ class CrudRoleTest extends TestCase
     public function test_role_sistem_bisa_dihapus_jika_tanpa_user(): void
     {
         // Semua role selain SUPER_ADMIN dapat dihapus meski is_system, selama tak ada user
-        $roleTanpaUser = Role::where('kode_role', 'ROLE_GURU_TETAP')->first();
+        $roleTanpaUser = Role::where('kode_role', 'ROLE_KARYAWAN_TETAP')->first();
 
         $this->actingAs($this->admin(), 'karyawan')
             ->postJson(route('admin.ajax.crud-role'), ['action' => 'hapus', 'id' => $roleTanpaUser->id])
@@ -65,14 +65,14 @@ class CrudRoleTest extends TestCase
 
     public function test_role_bertanda_user_tidak_bisa_dihapus(): void
     {
-        /** @var Karyawan $guru */
-        $guru = Karyawan::factory()->create(['role_id' => 4]);
+        /** @var Karyawan $kr */
+        $kr = Karyawan::factory()->create(['role_id' => 4]);
 
         $this->actingAs($this->admin(), 'karyawan')
-            ->postJson(route('admin.ajax.crud-role'), ['action' => 'hapus', 'id' => $guru->role_id])
+            ->postJson(route('admin.ajax.crud-role'), ['action' => 'hapus', 'id' => $kr->role_id])
             ->assertStatus(422);
 
-        $this->assertTrue(Role::where('id', $guru->role_id)->exists());
+        $this->assertTrue(Role::where('id', $kr->role_id)->exists());
     }
 
     public function test_role_biasa_bisa_ditambah_diedit_dihapus(): void

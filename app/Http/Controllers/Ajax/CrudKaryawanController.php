@@ -61,12 +61,12 @@ class CrudKaryawanController extends Controller
 
     /**
      * Default jam kerja: baca dari tabel pengaturan (bisa diubah admin via Manajemen Shift),
-     * fallback ke mapping RoleSeeder; non-guru 08:00-17:00.
+     * fallback ke mapping RoleSeeder; lainnya 08:00-17:00.
      */
     private function defaultJamKerja(int $roleId): array
     {
         $role = Role::find($roleId);
-        $jam = $role ? Pengaturan::jamKerjaGuru($role->kode_role) : null;
+        $jam = $role ? Pengaturan::jamKerjaJenis($role->kode_role) : null;
 
         return $jam ?? ['08:00:00', '17:00:00'];
     }
@@ -104,8 +104,8 @@ class CrudKaryawanController extends Controller
     }
 
     /**
-     * Default jam kerja berdasarkan role guru; fallback 08:00-17:00 untuk non-guru.
-     * Guru Honor (custom) tetap dipetakan ke nilai default sampai diubah admin.
+     * Default jam kerja berdasarkan jenis karyawan; fallback 08:00-17:00.
+     * Karyawan Honor (custom) tetap dipetakan ke nilai default sampai diubah admin.
      */
     private function resetPassword(Request $request)
     {

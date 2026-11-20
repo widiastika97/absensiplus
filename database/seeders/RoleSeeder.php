@@ -8,14 +8,14 @@ use Illuminate\Database\Seeder;
 class RoleSeeder extends Seeder
 {
     /**
-     * Jam kerja default per jenis guru (tipe guru dikelola via role).
+     * Jam kerja default per jenis karyawan (jenis dikelola via role).
      *
      * @var array<string, array{0: string, 1: string}|null>
      */
-    public const JAM_KERJA_GURU = [
-        'ROLE_GURU_TETAP' => ['07:30:00', '14:30:00'],
-        'ROLE_GURU_KONTRAK' => ['07:15:00', '15:00:00'],
-        'ROLE_GURU_HONOR' => null, // custom, diatur admin per karyawan
+    public const JAM_KERJA_JENIS = [
+        'ROLE_KARYAWAN_TETAP' => ['07:30:00', '14:30:00'],
+        'ROLE_KARYAWAN_KONTRAK' => ['07:15:00', '15:00:00'],
+        'ROLE_KARYAWAN_HONOR' => null, // custom, diatur admin per karyawan
     ];
 
     public function run(): void
@@ -59,27 +59,27 @@ class RoleSeeder extends Seeder
             ],
             [
                 'id' => 5,
-                'kode_role' => 'ROLE_GURU_TETAP',
-                'nama_role' => 'Guru Tetap Yayasan',
-                'deskripsi' => 'Guru tetap yayasan. Jam kerja 07:30 - 14:30. Presensi GPS, riwayat, cuti',
+                'kode_role' => 'ROLE_KARYAWAN_TETAP',
+                'nama_role' => 'Karyawan Tetap',
+                'deskripsi' => 'Karyawan tetap. Jam kerja 07:30 - 14:30. Presensi GPS, riwayat, cuti',
                 'warna_badge' => 'cyan',
                 'izin_akses' => ['presensi_masuk_pulang', 'riwayat_presensi_pribadi', 'pengajuan_cuti_karyawan'],
                 'is_system' => true,
             ],
             [
                 'id' => 6,
-                'kode_role' => 'ROLE_GURU_KONTRAK',
-                'nama_role' => 'Guru Tetap Yayasan (Kontrak)',
-                'deskripsi' => 'Guru tetap yayasan kontrak. Jam kerja 07:15 - 15:00. Presensi GPS, riwayat, cuti',
+                'kode_role' => 'ROLE_KARYAWAN_KONTRAK',
+                'nama_role' => 'Karyawan Kontrak',
+                'deskripsi' => 'Karyawan kontrak. Jam kerja 07:15 - 15:00. Presensi GPS, riwayat, cuti',
                 'warna_badge' => 'indigo',
                 'izin_akses' => ['presensi_masuk_pulang', 'riwayat_presensi_pribadi', 'pengajuan_cuti_karyawan'],
                 'is_system' => true,
             ],
             [
                 'id' => 7,
-                'kode_role' => 'ROLE_GURU_HONOR',
-                'nama_role' => 'Guru Honor',
-                'deskripsi' => 'Guru honor dengan jam kerja custom yang diatur admin. Presensi GPS, riwayat, cuti',
+                'kode_role' => 'ROLE_KARYAWAN_HONOR',
+                'nama_role' => 'Karyawan Honor',
+                'deskripsi' => 'Karyawan honor dengan jam kerja custom yang diatur admin. Presensi GPS, riwayat, cuti',
                 'warna_badge' => 'rose',
                 'izin_akses' => ['presensi_masuk_pulang', 'riwayat_presensi_pribadi', 'pengajuan_cuti_karyawan'],
                 'is_system' => true,

@@ -101,12 +101,12 @@ class DashboardController extends Controller
 
         $jamKerja = [
             'tetap' => [
-                'masuk' => Pengaturan::get('jam_guru_tetap_masuk', '07:30'),
-                'pulang' => Pengaturan::get('jam_guru_tetap_pulang', '14:30'),
+                'masuk' => Pengaturan::get('jam_karyawan_tetap_masuk', '07:30'),
+                'pulang' => Pengaturan::get('jam_karyawan_tetap_pulang', '14:30'),
             ],
             'kontrak' => [
-                'masuk' => Pengaturan::get('jam_guru_kontrak_masuk', '07:15'),
-                'pulang' => Pengaturan::get('jam_guru_kontrak_pulang', '15:00'),
+                'masuk' => Pengaturan::get('jam_karyawan_kontrak_masuk', '07:15'),
+                'pulang' => Pengaturan::get('jam_karyawan_kontrak_pulang', '15:00'),
             ],
         ];
 
