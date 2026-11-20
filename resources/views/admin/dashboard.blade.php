@@ -476,7 +476,7 @@
             </div>
             <div class="space-y-2">
                 <h3 class="text-xs font-bold text-slate-900"><i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i> Auto-Generate Roster Bulanan</h3>
-                <p class="text-[11px] text-slate-500">Generate roster sebulan penuh sesuai pola. Jam guru Tetap & Kontrak bisa di-set saat generate (default dari konfigurasi).</p>
+                <p class="text-[11px] text-slate-500">Generate roster sebulan penuh sesuai pola. Jam karyawan Tetap & Kontrak bisa di-set saat generate (default dari konfigurasi).</p>
                 <button type="button" onclick="openModalGenerate()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold cursor-pointer active:scale-95 transition"><i class="fa-solid fa-wand-magic-sparkles"></i> Buka Form Generate Roster</button>
             </div>
         </div>
@@ -1016,7 +1016,7 @@ function openModalShift(shift) {
 }
 function tutupModalShift() { $('#modal-shift').addClass('hidden').removeClass('flex'); }
 
-// ===== Preset jam kerja guru =====
+// ===== Auto-Generate Roster Bulanan =====
 function openModalGenerate() {
     Swal.fire({
         title: 'Auto-Generate Roster Bulanan',
@@ -1030,6 +1030,14 @@ function openModalGenerate() {
                 .gen-sec { background:#fffbeb; border:1px solid #fde68a; border-radius:14px; padding:10px; margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:left; }
             </style>
             <div class="gen-grid">
+                <div class="full">
+                    <label class="gen-label">Jenis Karyawan</label>
+                    <select id="gen-jenis" class="swal2-input gen-in">
+                        <option value="semua">Semua Jenis Karyawan</option>
+                        <option value="tetap">Karyawan Tetap</option>
+                        <option value="kontrak">Karyawan Kontrak</option>
+                    </select>
+                </div>
                 <div class="full">
                     <label class="gen-label">Karyawan</label>
                     <select id="gen-karyawan" class="swal2-input gen-in">
@@ -1053,16 +1061,16 @@ function openModalGenerate() {
             </div>
             <div class="gen-sec">
                 <div>
-                    <h4><i class="fa-solid fa-clock"></i> Guru Tetap Yayasan</h4>
+                    <h4><i class="fa-solid fa-clock"></i> Karyawan Tetap</h4>
                     <label class="gen-label">Jam Masuk</label><input type="time" id="gen-jam-tetap-masuk" value="{{ $jamKerja['tetap']['masuk'] }}" class="swal2-input gen-in">
                     <label class="gen-label" style="margin-top:6px">Jam Pulang</label><input type="time" id="gen-jam-tetap-pulang" value="{{ $jamKerja['tetap']['pulang'] }}" class="swal2-input gen-in">
                 </div>
                 <div>
-                    <h4><i class="fa-solid fa-clock"></i> Guru Tetap Kontrak</h4>
+                    <h4><i class="fa-solid fa-clock"></i> Karyawan Kontrak</h4>
                     <label class="gen-label">Jam Masuk</label><input type="time" id="gen-jam-kontrak-masuk" value="{{ $jamKerja['kontrak']['masuk'] }}" class="swal2-input gen-in">
                     <label class="gen-label" style="margin-top:6px">Jam Pulang</label><input type="time" id="gen-jam-kontrak-pulang" value="{{ $jamKerja['kontrak']['pulang'] }}" class="swal2-input gen-in">
                 </div>
-                <p class="full text-[9px] text-slate-400">Jam ini diterapkan ke karyawan dengan role guru terkait saat generate. Guru Honor diabaikan (custom).</p>
+                <p class="full text-[9px] text-slate-400">Jam ini diterapkan ke karyawan tetap & kontrak sesuai jenisnya saat generate. Karyawan dengan jam kerja custom diabaikan.</p>
             </div>
         `,
         width: 620,
@@ -1075,16 +1083,17 @@ function openModalGenerate() {
             const karyawan = $('#gen-karyawan').val();
             return {
                 karyawan_all: karyawan,
+                jenis: $('#gen-jenis').val(),
                 pola: $('#gen-pola').val(),
                 bulan: $('#gen-bulan').val(),
                 tahun: $('#gen-tahun').val(),
                 shift_pagi_id: $('#gen-shift-pagi').val(),
                 shift_off_id: $('#gen-shift-off').val(),
                 karyawan_ids: karyawan === 'all' ? 'all' : [karyawan],
-                jam_guru_tetap_masuk: $('#gen-jam-tetap-masuk').val(),
-                jam_guru_tetap_pulang: $('#gen-jam-tetap-pulang').val(),
-                jam_guru_kontrak_masuk: $('#gen-jam-kontrak-masuk').val(),
-                jam_guru_kontrak_pulang: $('#gen-jam-kontrak-pulang').val(),
+                jam_tetap_masuk: $('#gen-jam-tetap-masuk').val(),
+                jam_tetap_pulang: $('#gen-jam-tetap-pulang').val(),
+                jam_kontrak_masuk: $('#gen-jam-kontrak-masuk').val(),
+                jam_kontrak_pulang: $('#gen-jam-kontrak-pulang').val(),
             };
         },
     }).then((result) => {
@@ -1197,29 +1206,14 @@ function openModalAssign(empId, tanggal) {
     });
 }
 
-$('#form-pola').on('submit', function (e) {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(this).entries());
-    Swal.fire({
-        title: 'Generate roster bulanan?',
-        text: 'Jadwal shift existing pada bulan tersebut akan ditimpa.',
-        icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, generate'
-    }).then(r => {
-        if (r.isConfirmed) {
-            data.action = 'generate_pola_bulanan';
-            data.karyawan_ids = data.karyawan_all === 'all' ? 'all' : [data.karyawan_all];
-            delete data.karyawan_all;
-            ajaxPost("{{ route('admin.ajax.crud-shift') }}", data);
-        }
-    });
-});
-
 // ===== Seeder Absensi =====
 function openModalRole(role) {
     $('#form-role')[0].reset();
     $('#form-role').data('id', role?.id || '');
     $('#modal-role-title').text(role ? 'Edit Role: ' + role.nama_role : 'Tambah Role');
     $('#wrap-role-kode').toggle(!role);
+    // input wajib yang disembunyikan tidak boleh memblokir validasi form saat edit
+    $('#role-kode').prop('disabled', !!role);
     $('#role-nama').val(role?.nama_role || '');
     $('#role-deskripsi').val(role?.deskripsi || '');
     const izin = role?.izin_akses || [];

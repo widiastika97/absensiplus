@@ -135,9 +135,26 @@ class CrudShiftController extends Controller
         $shiftOffId = (int) $request->input('shift_off_id', $defaultOffId);
 
         $karyawanIds = $request->input('karyawan_ids', 'all');
+        $jenis = in_array($request->input('jenis', 'semua'), ['tetap', 'kontrak'], true)
+            ? $request->input('jenis', 'semua')
+            : 'semua';
 
         if ($karyawanIds === 'all' || (is_array($karyawanIds) && (empty($karyawanIds) || in_array('all', $karyawanIds)))) {
-            $karyawanIds = Karyawan::where('is_active', 1)->pluck('id')->toArray();
+            $query = Karyawan::where('is_active', 1);
+
+            if ($jenis !== 'semua') {
+                $kodeRole = $jenis === 'tetap' ? 'ROLE_GURU_TETAP' : 'ROLE_GURU_KONTRAK';
+                $roleId = Role::where('kode_role', $kodeRole)->value('id');
+                if (! $roleId) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Role '.$kodeRole.' tidak ditemukan!',
+                    ], 422);
+                }
+                $query->where('role_id', $roleId);
+            }
+
+            $karyawanIds = $query->pluck('id')->toArray();
         }
 
         if (empty($karyawanIds)) {
@@ -190,22 +207,22 @@ class CrudShiftController extends Controller
             JadwalShiftKaryawan::upsert($chunk, ['karyawan_id', 'tanggal'], ['shift_id']);
         }
 
-        // Terapkan jam kerja guru (Tetap & Kontrak) dari form generate ke karyawan terkait.
-        // Guru Honor diabaikan (custom via assign roster).
-        $jamTetap = $request->input('jam_guru_tetap_masuk');
-        $jamKontrak = $request->input('jam_guru_kontrak_masuk');
+        // Terapkan jam kerja karyawan tetap & kontrak dari form generate ke karyawan terkait.
+        // Karyawan dengan jam kerja custom diabaikan (diatur via assign roster).
+        $jamTetap = $request->input('jam_tetap_masuk') ?? $request->input('jam_guru_tetap_masuk');
+        $jamKontrak = $request->input('jam_kontrak_masuk') ?? $request->input('jam_guru_kontrak_masuk');
         if ($jamTetap || $jamKontrak) {
             $kodePeta = [];
             if ($jamTetap) {
                 $kodePeta['ROLE_GURU_TETAP'] = [
                     'jam_masuk' => $jamTetap,
-                    'jam_pulang' => $request->input('jam_guru_tetap_pulang', '14:30'),
+                    'jam_pulang' => $request->input('jam_tetap_pulang', $request->input('jam_guru_tetap_pulang', '14:30')),
                 ];
             }
             if ($jamKontrak) {
                 $kodePeta['ROLE_GURU_KONTRAK'] = [
                     'jam_masuk' => $jamKontrak,
-                    'jam_pulang' => $request->input('jam_guru_kontrak_pulang', '15:00'),
+                    'jam_pulang' => $request->input('jam_kontrak_pulang', $request->input('jam_guru_kontrak_pulang', '15:00')),
                 ];
             }
 
