@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\JadwalLibur;
 use App\Models\Karyawan;
 use App\Models\Presensi;
-use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -60,23 +59,12 @@ class AbsensiController extends Controller
         // Pengajuan dispensasi terbaru
         $pengajuanLain = $user->pengajuanLainnya()->orderByDesc('created_at')->limit(3)->get();
 
-        // Input prestasi/pelanggaran muncul setelah guru absen masuk (atau hari off); admin selalu bisa
-        $sudahAbsenUntukCatatan = $user->isAdmin()
-            || (bool) $logMasuk
-            || (bool) $isShiftOff;
-
         return view('karyawan.absen', [
             'user' => $user,
             'logMasuk' => $logMasuk,
             'logPulang' => $logPulang,
             'sudahMasuk' => $logsHariIni->contains('tipe', 'masuk'),
             'sudahPulang' => $logsHariIni->contains('tipe', 'pulang'),
-            'sudahAbsenUntukCatatan' => $sudahAbsenUntukCatatan,
-            'siswaList' => Siswa::where('is_active', 1)->orderBy('nama')->get(),
-            'guruList' => $user->isAdmin()
-                ? Karyawan::where('is_active', 1)->orderBy('nama')->get(['id', 'nama', 'nip'])
-                : collect(),
-            'isAdminPengguna' => $user->isAdmin(),
             'namaShiftAktif' => $namaShiftAktif,
             'isShiftOff' => $isShiftOff,
             'isNightShift' => $isNightShift,

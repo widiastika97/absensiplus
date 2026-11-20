@@ -18,9 +18,6 @@ use App\Http\Controllers\Ajax\GetRiwayatPresensiController;
 use App\Http\Controllers\Ajax\SimpanAbsenController;
 use App\Http\Controllers\Ajax\SubmitCutiController;
 use App\Http\Controllers\Ajax\SubmitPengajuanLainController;
-use App\Http\Controllers\Ajax\SubmitPrestasiPelanggaranController;
-use App\Http\Controllers\Admin\LaporanPrestasiController;
-use App\Http\Controllers\Karyawan\PrestasiPelanggaranController;
 use App\Http\Controllers\Ajax\UpdateFotoProfilController;
 use App\Http\Controllers\Ajax\UpdateSaldoCutiController;
 use App\Http\Controllers\Auth\LoginController;
@@ -60,11 +57,6 @@ Route::middleware('auth:karyawan')->group(function () {
     Route::get('riwayat', [RiwayatController::class, 'index'])->name('riwayat');
     Route::get('ajax/riwayat-presensi', GetRiwayatPresensiController::class)->name('ajax.riwayat-presensi');
 
-    // Prestasi & pelanggaran (dashboard 3 tab: Absen / Prestasi / Pelanggaran)
-    Route::get('prestasi', PrestasiPelanggaranController::class)->defaults('kategori', 'prestasi')->name('prestasi');
-    Route::get('pelanggaran', PrestasiPelanggaranController::class)->defaults('kategori', 'pelanggaran')->name('pelanggaran');
-    Route::post('ajax/submit-prestasi-pelanggaran', SubmitPrestasiPelanggaranController::class)->name('ajax.submit-prestasi-pelanggaran');
-
     // Profil
     Route::get('profil', [ProfilController::class, 'index'])->name('profil');
     Route::post('profil', [ProfilController::class, 'update'])->name('profil.update');
@@ -82,10 +74,6 @@ Route::middleware('auth:karyawan')->group(function () {
     // Info cuti & libur
     Route::get('ajax/cuti-karyawan', GetCutiKaryawanController::class)->name('ajax.cuti-karyawan');
     Route::get('ajax/jadwal-libur', GetJadwalLiburController::class)->name('ajax.jadwal-libur');
-
-    // Laporan prestasi & pelanggaran (role yang diberi izin, tampil di portal absen)
-    Route::get('laporan-prestasi', LaporanPrestasiController::class)
-        ->middleware('permission:laporan_prestasi_pelanggaran')->name('laporan-prestasi');
 });
 
 /*

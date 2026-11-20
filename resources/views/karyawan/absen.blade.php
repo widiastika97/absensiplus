@@ -100,39 +100,7 @@
         </div>
     </div>
 
-
-    <!-- 4. KONTEKSTUAL: CATATAN PRESTASI/PELANGGARAN -->
-    @if($sudahMasuk && !$sudahPulang)
-    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3" id="panel-catatan">
-        <h3 class="text-xs font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-trophy text-emerald-600"></i> Catatan Prestasi & Pelanggaran</h3>
-        <p class="text-[11px] text-slate-500">Wajib melampirkan foto bukti. Hanya tersedia selama jam kerja (setelah presensi masuk).</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button type="button" onclick="bukaModalCatatan('prestasi')" class="p-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-left transition active:scale-98 cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-trophy"></i></div>
-                    <div><p class="text-sm font-bold text-emerald-800">Tambah Prestasi</p><p class="text-[11px] text-emerald-600">Siswa{{ $isAdminPengguna ? ' / Guru' : '' }}</p></div>
-                </div>
-            </button>
-            <button type="button" onclick="bukaModalCatatan('pelanggaran')" class="p-4 rounded-2xl border-2 border-rose-300 bg-rose-50 hover:bg-rose-100 text-left transition active:scale-98 cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div><p class="text-sm font-bold text-rose-800">Tambah Pelanggaran</p><p class="text-[11px] text-rose-600">Siswa{{ $isAdminPengguna ? ' / Guru' : '' }}</p></div>
-                </div>
-            </button>
-            @can('laporan_prestasi_pelanggaran')
-            <a href="{{ route('laporan-prestasi') }}" class="sm:col-span-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition cursor-pointer shadow-sm">
-                <i class="fa-solid fa-chart-bar"></i> Lihat Laporan Prestasi & Pelanggaran
-            </a>
-            @endcan
-        </div>
-    </div>
-    @elseif($sudahMasuk && $sudahPulang)
-    <p class="text-[11px] text-slate-500 bg-white border border-slate-200 rounded-2xl p-3 shadow-sm"><i class="fa-solid fa-circle-check text-emerald-500"></i> Absensi hari ini sudah lengkap — pengisian prestasi/pelanggaran hanya tersedia selama jam kerja.</p>
-    @else
-    <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-2xl p-3 shadow-sm"><i class="fa-solid fa-circle-info"></i> Anda dapat menambahkan Prestasi/Pelanggaran setelah melakukan presensi masuk hari ini.</p>
-    @endif
-
-    <!-- 5. PELENGKAP -->
+    <!-- 4. PELENGKAP -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div class="bg-slate-50/70 rounded-xl border border-slate-100 p-3"><p class="text-[10px] font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1"><i class="fa-solid fa-business-time text-blue-500"></i> Shift Hari Ini</p><p class="text-base font-bold text-slate-800 mt-1">{{ $namaShiftAktif }}</p></div>
         <div class="bg-slate-50/70 rounded-xl border border-slate-100 p-3"><p class="text-[10px] font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1"><i class="fa-solid fa-calendar-days text-emerald-500"></i> Sisa Cuti {{ now()->year }}</p><p class="text-base font-bold text-slate-800 mt-1">{{ $kuota['remaining_quota'] }} / {{ $kuota['total_quota'] }} hari</p></div>
@@ -194,64 +162,6 @@
     </div>
 </div>
 
-<!-- Modal Catat Prestasi/Pelanggaran -->
-<div id="modal-catatan" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
-    <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl max-h-[92vh] overflow-y-auto">
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white">
-            <div>
-                <h3 class="text-sm font-bold text-slate-900" id="catatan-title">Tambah Prestasi</h3>
-                <p class="text-[11px] text-slate-500">Isi data & unggah foto bukti</p>
-            </div>
-            <button type="button" onclick="tutupModalCatatan()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <form id="form-catatan" class="p-5 space-y-3" enctype="multipart/form-data">
-            <input type="hidden" name="kategori" id="catatan-kategori" value="prestasi">
-            <div>
-                <label class="text-[11px] font-bold text-slate-500 uppercase">Subjek</label>
-                <select name="subjek" id="catatan-subjek" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white">
-                    <option value="siswa">Siswa</option>
-                    @if(auth('karyawan')->user()->isAdmin())<option value="guru">Guru (Admin)</option>@endif
-                </select>
-            </div>
-            <div id="catatan-wrap-siswa">
-                <label class="text-[11px] font-bold text-slate-500 uppercase">Siswa</label>
-                <select name="siswa_id" id="catatan-siswa" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white">
-                    <option value="">— Pilih Siswa —</option>
-                    @foreach($siswaList ?? [] as $s)
-                    <option value="{{ $s->id }}">{{ $s->nis }} • {{ $s->nama }}{{ $s->kelas ? ' ('.$s->kelas.')' : '' }}</option>
-                    @endforeach
-                </select>
-                <input type="text" name="nama_manual" placeholder="atau isi nama manual" class="w-full mt-2 px-3 py-2 rounded-xl border border-slate-200 text-xs">
-            </div>
-            <div id="catatan-wrap-guru" class="hidden">
-                <label class="text-[11px] font-bold text-slate-500 uppercase">Guru</label>
-                <select name="guru_id" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white">
-                    <option value="">— Pilih Guru —</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-500 uppercase">Judul *</label>
-                <input type="text" name="judul" required id="catatan-judul" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-xs">
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 uppercase">Tanggal *</label>
-                    <input type="date" name="tanggal" required value="{{ now()->toDateString() }}" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-xs">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 uppercase">Keterangan</label>
-                    <input type="text" name="keterangan" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-xs">
-                </div>
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-500 uppercase">Foto Bukti *</label>
-                <input type="file" name="foto_bukti" id="catatan-foto" accept="image/jpeg,image/png,image/webp" required class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-xs file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-slate-900 file:text-white file:text-[11px] file:font-bold file:cursor-pointer cursor-pointer">
-                <img id="catatan-preview" class="hidden mt-2 max-h-36 rounded-xl border border-slate-200" alt="Preview">
-            </div>
-            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold cursor-pointer"><i class="fa-solid fa-floppy-disk"></i> Simpan Catatan</button>
-        </form>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
@@ -259,50 +169,6 @@
 function perbesarFoto(url) {
     Swal.fire({ imageUrl: url, imageAlt: 'Swafoto Absensi', confirmButtonText: 'Tutup', confirmButtonColor: '#2563eb', customClass: { popup: 'rounded-3xl' } });
 }
-
-// ===== Catat Prestasi/Pelanggaran =====
-function bukaModalCatatan(kategori) {
-    $('#catatan-title').text(kategori === 'prestasi' ? 'Tambah Prestasi' : 'Tambah Pelanggaran');
-    $('#catatan-preview').addClass('hidden');
-    $('#form-catatan')[0].reset();
-    $('#catatan-kategori').val(kategori);
-    $('#modal-catatan').removeClass('hidden').addClass('flex');
-}
-function tutupModalCatatan() { $('#modal-catatan').addClass('hidden').removeClass('flex'); }
-
-$('#catatan-subjek').change(function () {
-    const isGuru = $(this).val() === 'guru';
-    $('#catatan-wrap-siswa').toggleClass('hidden', isGuru);
-    $('#catatan-wrap-guru').toggleClass('hidden', !isGuru);
-});
-
-$('#catatan-foto').change(function () {
-    const f = this.files?.[0];
-    if (f && f.type.startsWith('image/')) {
-        $('#catatan-preview').attr('src', URL.createObjectURL(f)).removeClass('hidden');
-    } else {
-        $('#catatan-preview').addClass('hidden');
-    }
-});
-
-$('#form-catatan').on('submit', function (e) {
-    e.preventDefault();
-    if (!document.getElementById('catatan-foto').files.length) {
-        Swal.fire({icon:'warning', title:'Foto bukti wajib diunggah'}); return;
-    }
-    const fd = new FormData(this);
-    fd.append('_token', $('meta[name="csrf-token"]').attr('content'));
-    $.ajax({
-        url: "{{ route('ajax.submit-prestasi-pelanggaran') }}",
-        type: 'POST', data: fd, processData: false, contentType: false, dataType: 'json',
-        success: res => {
-            if (res.status === 'success')
-                Swal.fire({icon:'success', title:'Tersimpan', text:res.message, timer:1600, showConfirmButton:false}).then(() => { tutupModalCatatan(); $('#form-catatan')[0].reset(); });
-            else Swal.fire({icon:'error', title:'Gagal', text:res.message});
-        },
-        error: xhr => Swal.fire({icon:'error', title:'Gagal', text: xhr.responseJSON?.message || 'Terjadi kesalahan.'})
-    });
-});
 
 // ===== Presensi Masuk & Pulang =====
 $(function () {

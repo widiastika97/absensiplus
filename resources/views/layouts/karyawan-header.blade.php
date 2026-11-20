@@ -36,11 +36,6 @@
                     <i class="fa-solid fa-envelope-open-text"></i> Cuti
                 </a>
                 @endcanany
-                @can('laporan_prestasi_pelanggaran')
-                <a href="{{ route('laporan-prestasi') }}" @class(['px-3 py-1.5 rounded-lg transition', request()->routeIs('laporan-prestasi') ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'])>
-                    <i class="fa-solid fa-trophy"></i> Laporan
-                </a>
-                @endcan
                 <a href="{{ route('profil') }}" @class(['px-3 py-1.5 rounded-lg transition', request()->routeIs('profil') ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'])>
                     <i class="fa-solid fa-user"></i> Profil
                 </a>
@@ -74,12 +69,6 @@
             request()->routeIs('pengajuan-cuti') ? 'text-blue-600 bg-blue-50' : 'text-slate-500'
         ])><i class="fa-solid fa-envelope-open-text text-base"></i> Cuti</a>
         @endcanany
-        @can('laporan_prestasi_pelanggaran')
-        <a href="{{ route('laporan-prestasi') }}" @class([
-            'flex flex-1 flex-col items-center justify-center py-2.5 text-[10px] font-bold transition',
-            request()->routeIs('laporan-prestasi') ? 'text-blue-600 bg-blue-50' : 'text-slate-500'
-        ])><i class="fa-solid fa-trophy text-base"></i> Laporan</a>
-        @endcan
         <a href="{{ route('profil') }}" @class([
             'flex flex-1 flex-col items-center justify-center py-2.5 text-[10px] font-bold transition',
             request()->routeIs('profil') ? 'text-blue-600 bg-blue-50' : 'text-slate-500'

@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CutiKaryawan;
 use App\Models\JadwalLibur;
 use App\Models\Karyawan;
-use App\Models\LokasiKantor;
-use App\Models\PengajuanLainnya;
+use App\Models\LokasiKantor;use App\Models\PengajuanLainnya;
 use App\Models\Pengaturan;
 use App\Models\Presensi;
 use App\Models\Role;
@@ -21,8 +20,6 @@ class DashboardController extends Controller
     {
         $user = Auth::guard('karyawan')->user();
         $today = now()->toDateString();
-
-        $laporan = LaporanPrestasiController::reportData($request);
 
         $stats = [
             'total_karyawan' => Karyawan::count(),
@@ -124,8 +121,6 @@ class DashboardController extends Controller
             'admin_manajemen_role' => 'Role RBAC',
             'admin_log_presensi' => 'Log Audit',
             'admin_rekap_ekspor' => 'Ekspor Laporan',
-            'laporan_prestasi_pelanggaran' => 'Laporan Prestasi',
-            'prestasi_pelanggaran_siswa' => 'Catat Prestasi/Pelanggaran Siswa',
         ];
 
         $jadwalLiburList = JadwalLibur::orderBy('tanggal_mulai')->get();
@@ -158,14 +153,13 @@ class DashboardController extends Controller
             ];
         })->values();
 
-        return view('admin.dashboard', array_merge([
+        return view('admin.dashboard', [
             'user' => $user,
             'stats' => $stats,
             'logDari' => $logDari,
             'logSampai' => $logSampai,
             'logDept' => $logDept,
             'departemenList' => $departemenList,
-            'laporan' => $laporan,
             'presensiHariIni' => $presensiHariIni,
             'lokasiList' => $lokasiList,
             'rolesList' => $rolesList,
@@ -186,6 +180,6 @@ class DashboardController extends Controller
             'allDispensasiList' => $allDispensasiList,
             'kuotaRekap' => $kuotaRekap,
             'filterTanggal' => $request->query('tanggal', $today),
-        ], $laporan));
+        ]);
     }
 }

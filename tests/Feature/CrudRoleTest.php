@@ -82,7 +82,7 @@ class CrudRoleTest extends TestCase
                 'action' => 'tambah',
                 'kode_role' => 'ROLE_KEPALA_SEKOLAH',
                 'nama_role' => 'Kepala Sekolah',
-                'izin_akses' => json_encode(['presensi_masuk_pulang', 'laporan_prestasi_pelanggaran']),
+                'izin_akses' => json_encode(['presensi_masuk_pulang']),
             ])->assertStatus(200);
 
         $role = Role::where('kode_role', 'ROLE_KEPALA_SEKOLAH')->first();

@@ -76,9 +76,6 @@
         <button data-tab="tab-cuti" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 whitespace-nowrap cursor-pointer">Cuti & Dispensasi</button>
         <button data-tab="tab-laporan" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 whitespace-nowrap cursor-pointer">Rekap & Ekspor</button>
         <button data-tab="tab-shift" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 whitespace-nowrap cursor-pointer">Manajemen Shift</button>
-        @can('laporan_prestasi_pelanggaran')
-        <button data-tab="tab-laporan-prestasi" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 whitespace-nowrap cursor-pointer">Laporan Prestasi</button>
-        @endcan
     </div>
 
     <!-- TAB: Log Absensi (filter by tanggal) -->
@@ -649,17 +646,6 @@
             </form>
         </div>
     </div>
-
-    <!-- TAB: Laporan Prestasi & Pelanggaran -->
-    @can('laporan_prestasi_pelanggaran')
-    <div id="tab-laporan-prestasi" class="tab-content hidden space-y-5">
-        <div class="flex flex-wrap items-center justify-between gap-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
-            <p class="text-xs text-slate-500"><i class="fa-solid fa-circle-info text-blue-500"></i> Periode: <strong>{{ \Illuminate\Support\Carbon::parse($laporan['dari'])->translatedFormat('d M Y') }} — {{ \Illuminate\Support\Carbon::parse($laporan['sampai'])->translatedFormat('d M Y') }}</strong></p>
-            <a href="{{ route('laporan-prestasi') }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Halaman Laporan (filter tanggal)</a>
-        </div>
-        @include('admin.partials.laporan-prestasi-content', ['laporan' => $laporan, 'hideFilter' => true])
-    </div>
-    @endcan
 </main>
 
 <!-- Modal Lokasi -->
