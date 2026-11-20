@@ -1061,16 +1061,11 @@ function openModalGenerate() {
             </div>
             <div class="gen-sec">
                 <div>
-                    <h4><i class="fa-solid fa-clock"></i> Karyawan Tetap</h4>
-                    <label class="gen-label">Jam Masuk</label><input type="time" id="gen-jam-tetap-masuk" value="{{ $jamKerja['tetap']['masuk'] }}" class="swal2-input gen-in">
-                    <label class="gen-label" style="margin-top:6px">Jam Pulang</label><input type="time" id="gen-jam-tetap-pulang" value="{{ $jamKerja['tetap']['pulang'] }}" class="swal2-input gen-in">
+                    <h4><i class="fa-solid fa-clock"></i> Jam Kerja</h4>
+                    <label class="gen-label">Jam Masuk</label><input type="time" id="gen-jam-masuk" value="{{ $jamKerja['tetap']['masuk'] }}" class="swal2-input gen-in">
+                    <label class="gen-label" style="margin-top:6px">Jam Pulang</label><input type="time" id="gen-jam-pulang" value="{{ $jamKerja['tetap']['pulang'] }}" class="swal2-input gen-in">
                 </div>
-                <div>
-                    <h4><i class="fa-solid fa-clock"></i> Karyawan Kontrak</h4>
-                    <label class="gen-label">Jam Masuk</label><input type="time" id="gen-jam-kontrak-masuk" value="{{ $jamKerja['kontrak']['masuk'] }}" class="swal2-input gen-in">
-                    <label class="gen-label" style="margin-top:6px">Jam Pulang</label><input type="time" id="gen-jam-kontrak-pulang" value="{{ $jamKerja['kontrak']['pulang'] }}" class="swal2-input gen-in">
-                </div>
-                <p class="full text-[9px] text-slate-400">Jam ini diterapkan ke karyawan tetap & kontrak sesuai jenisnya saat generate. Karyawan dengan jam kerja custom diabaikan.</p>
+                <p class="full text-[9px] text-slate-400">Jam ini diterapkan ke karyawan sesuai Jenis Karyawan yang dipilih saat generate. Karyawan dengan jam kerja custom diabaikan.</p>
             </div>
         `,
         width: 620,
@@ -1090,10 +1085,8 @@ function openModalGenerate() {
                 shift_pagi_id: $('#gen-shift-pagi').val(),
                 shift_off_id: $('#gen-shift-off').val(),
                 karyawan_ids: karyawan === 'all' ? 'all' : [karyawan],
-                jam_tetap_masuk: $('#gen-jam-tetap-masuk').val(),
-                jam_tetap_pulang: $('#gen-jam-tetap-pulang').val(),
-                jam_kontrak_masuk: $('#gen-jam-kontrak-masuk').val(),
-                jam_kontrak_pulang: $('#gen-jam-kontrak-pulang').val(),
+                jam_masuk: $('#gen-jam-masuk').val(),
+                jam_pulang: $('#gen-jam-pulang').val(),
             };
         },
     }).then((result) => {

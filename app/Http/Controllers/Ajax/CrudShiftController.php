@@ -207,33 +207,24 @@ class CrudShiftController extends Controller
             JadwalShiftKaryawan::upsert($chunk, ['karyawan_id', 'tanggal'], ['shift_id']);
         }
 
-        // Terapkan jam kerja karyawan tetap & kontrak dari form generate ke karyawan terkait.
+        // Terapkan jam kerja dari form generate ke karyawan sesuai jenis yang dipilih.
         // Karyawan dengan jam kerja custom diabaikan (diatur via assign roster).
-        $jamTetap = $request->input('jam_tetap_masuk') ?? $request->input('jam_guru_tetap_masuk');
-        $jamKontrak = $request->input('jam_kontrak_masuk') ?? $request->input('jam_guru_kontrak_masuk');
-        if ($jamTetap || $jamKontrak) {
-            $kodePeta = [];
-            if ($jamTetap) {
-                $kodePeta['ROLE_GURU_TETAP'] = [
-                    'jam_masuk' => $jamTetap,
-                    'jam_pulang' => $request->input('jam_tetap_pulang', $request->input('jam_guru_tetap_pulang', '14:30')),
-                ];
-            }
-            if ($jamKontrak) {
-                $kodePeta['ROLE_GURU_KONTRAK'] = [
-                    'jam_masuk' => $jamKontrak,
-                    'jam_pulang' => $request->input('jam_kontrak_pulang', $request->input('jam_guru_kontrak_pulang', '15:00')),
-                ];
-            }
+        $jamMasuk = $request->input('jam_masuk') ?? $request->input('jam_tetap_masuk');
+        if ($jamMasuk) {
+            $kodeRoles = match ($jenis) {
+                'tetap' => ['ROLE_GURU_TETAP'],
+                'kontrak' => ['ROLE_GURU_KONTRAK'],
+                default => ['ROLE_GURU_TETAP', 'ROLE_GURU_KONTRAK'],
+            };
 
-            foreach ($kodePeta as $kode => $jamHasil) {
+            foreach ($kodeRoles as $kode) {
                 $roleId = Role::where('kode_role', $kode)->value('id');
                 if (! $roleId) {
                     continue;
                 }
                 Karyawan::where('role_id', $roleId)->update([
-                    'jam_masuk' => $jamHasil['jam_masuk'].':00',
-                    'jam_pulang' => $jamHasil['jam_pulang'].':00',
+                    'jam_masuk' => $jamMasuk.':00',
+                    'jam_pulang' => ($request->input('jam_pulang') ?? $request->input('jam_tetap_pulang', '14:30')).':00',
                 ]);
             }
         }
