@@ -717,7 +717,9 @@
                 <input type="time" name="jam_masuk" id="karyawan-jam-masuk" value="08:00" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                 <input type="time" name="jam_pulang" id="karyawan-jam-pulang" value="17:00" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
             </div>
-            <input type="password" name="password" id="karyawan-password" placeholder="Password awal (default: 123456)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+            <div id="wrap-karyawan-password">
+                <input type="password" name="password" id="karyawan-password" placeholder="Password awal (default: 123456)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+            </div>
             <div class="flex gap-2">
                 <button type="button" onclick="closeModalKaryawan()" class="flex-1 py-2.5 bg-slate-100 rounded-xl text-xs font-bold cursor-pointer">Batal</button>
                 <button type="submit" class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold cursor-pointer">Simpan</button>
@@ -927,6 +929,7 @@ function openModalKaryawan() {
     $('#modal-karyawan-title').text('Tambah Karyawan');
     $('#form-karyawan')[0].reset();
     $('#karyawan-id').val('');
+    $('#wrap-karyawan-password').removeClass('hidden');
     $('#modal-karyawan').removeClass('hidden').addClass('flex');
 }
 function closeModalKaryawan() { $('#modal-karyawan').addClass('hidden').removeClass('flex'); }
@@ -937,7 +940,8 @@ function editKaryawan(k) {
     $('#karyawan-departemen').val(k.departemen); $('#karyawan-jabatan').val(k.jabatan);
     $('#karyawan-role').val(k.role_id); $('#karyawan-agama').val(k.agama);
     $('#karyawan-nip').val(k.nip).prop('disabled', true);
-    $('#karyawan-password').val('').closest('div').hide();
+    // sembunyikan field password; jangan menyembunyikan container modal
+    $('#wrap-karyawan-password').addClass('hidden');
     $('#modal-karyawan').removeClass('hidden').addClass('flex');
 }
 
