@@ -77,6 +77,7 @@
             @unless($sudahMasuk)
             <button type="button" id="btn-trigger-absen" data-tipe="masuk"
                 data-mulai="{{ $windowMulai->getTimestampMs() }}"
+                data-bisa="{{ $bisaPresensiMasuk }}"
                 data-selesai="{{ $windowSelesai->getTimestampMs() }}"
                 data-label="{{ $windowMulai->format('H:i') }} - {{ $windowSelesai->format('H:i') }}"
                 data-off="{{ $isShiftOff ? '1' : '0' }}"
