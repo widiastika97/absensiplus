@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -146,5 +147,34 @@ class Karyawan extends Authenticatable
             ->where('tanggal', $tanggal)
             ->with('shift')
             ->first();
+    }
+
+    /**
+     * Jendela waktu tombol Presensi Masuk aktif:
+     * dari 1 jam sebelum jam masuk sampai jam pulang.
+     * Mengembalikan [Carbon $mulai, Carbon $selesai].
+     */
+    public function jendelaPresensiMasuk(string $tanggal): array
+    {
+        $roster = $this->shiftHariIni($tanggal);
+
+        if ($roster && $roster->shift) {
+            $jamMasuk  = $roster->shift->jam_masuk;
+            $jamPulang = $roster->shift->jam_pulang;
+        } else {
+            // fallback: jam custom karyawan -> default 08:00-17:00
+            $jamMasuk  = $this->jam_masuk  ?: '08:00';
+            $jamPulang = $this->jam_pulang ?: '17:00';
+        }
+
+        $masuk  = Carbon::parse($tanggal . ' ' . $jamMasuk);
+        $pulang = Carbon::parse($tanggal . ' ' . $jamPulang);
+
+        // Shift malam (pulang melewati tengah malam)
+        if ($pulang->lessThanOrEqualTo($masuk)) {
+            $pulang->addDay();
+        }
+
+        return [$masuk->copy()->subHour(), $pulang];
     }
 }

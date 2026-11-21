@@ -33,10 +33,10 @@
                 <img src="/storage/selfie/{{ $logMasuk->foto_selfie }}" onclick="perbesarFoto(this.src)" class="w-full aspect-square rounded-xl border border-slate-200 cursor-pointer hover:opacity-90 transition shadow-sm object-cover" alt="Swafoto masuk">
                 @else
                 <div class="w-full aspect-square rounded-xl bg-gradient-to-br from-slate-100 to-emerald-50 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400">
-    <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-2"><i class="fa-solid fa-user text-2xl text-emerald-500"></i></div>
-    <span class="text-xs font-bold">Belum Ada Bukti</span>
-    <span class="text-[10px] font-medium text-slate-400 mt-0.5">Ambil swafoto saat presensi masuk</span>
-</div>
+                    <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-2"><i class="fa-solid fa-user text-2xl text-emerald-500"></i></div>
+                    <span class="text-xs font-bold">Belum Ada Bukti</span>
+                    <span class="text-[10px] font-medium text-slate-400 mt-0.5">Ambil swafoto saat presensi masuk</span>
+                </div>
                 @endif
             </div>
             <div class="flex flex-col gap-1">
@@ -45,15 +45,14 @@
                 <img src="/storage/selfie/{{ $logPulang->foto_selfie }}" onclick="perbesarFoto(this.src)" class="w-full aspect-square rounded-xl border border-slate-200 cursor-pointer hover:opacity-90 transition shadow-sm object-cover" alt="Swafoto pulang">
                 @else
                 <div class="w-full aspect-square rounded-xl bg-gradient-to-br from-slate-100 to-blue-50 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400">
-    <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-2"><i class="fa-solid fa-camera text-2xl text-blue-500"></i></div>
-    <span class="text-xs font-bold">Belum Ada Bukti</span>
-    <span class="text-[10px] font-medium text-slate-400 mt-0.5">Ambil swafoto saat presensi pulang</span>
-</div>
-                
+                    <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-2"><i class="fa-solid fa-camera text-2xl text-blue-500"></i></div>
+                    <span class="text-xs font-bold">Belum Ada Bukti</span>
+                    <span class="text-[10px] font-medium text-slate-400 mt-0.5">Ambil swafoto saat presensi pulang</span>
+                </div>
+                @endif
             </div>
         </div>
     </div>
-    @endif
     @endif
 
     <!-- 3. HIGHLIGHT: RADAR GPS + TOMBOL -->
@@ -76,15 +75,34 @@
         </div>
         <div class="grid grid-cols-1 gap-4">
             @unless($sudahMasuk)
-            <button type="button" id="btn-trigger-absen" data-tipe="masuk" class="p-5 rounded-2xl border-2 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 cursor-pointer transition active:scale-98 text-left">
+            <button type="button" id="btn-trigger-absen" data-tipe="masuk"
+                data-mulai="{{ $windowMulai->getTimestampMs() }}"
+                data-selesai="{{ $windowSelesai->getTimestampMs() }}"
+                data-label="{{ $windowMulai->format('H:i') }} - {{ $windowSelesai->format('H:i') }}"
+                data-off="{{ $isShiftOff ? '1' : '0' }}"
+                @disabled(!$bisaPresensiMasuk)
+                class="p-5 rounded-2xl border-2 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 cursor-pointer transition active:scale-98 text-left disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-50 disabled:active:scale-100">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-xl shadow-lg shadow-emerald-600/20"><i class="fa-solid fa-fingerprint"></i></div>
-                    <div><p class="text-sm font-bold text-emerald-800">Presensi Masuk</p><p class="text-[11px] text-emerald-600">Klik untuk ambil swafoto & absen</p></div>
+                    <div>
+                        <p class="text-sm font-bold text-emerald-800">Presensi Masuk</p>
+                        <p id="info-jendela-masuk" class="text-[11px] text-emerald-600">
+                            @if($isShiftOff)
+                                Hari ini libur, presensi tidak diperlukan
+                            @elseif($bisaPresensiMasuk)
+                                Klik untuk ambil swafoto & absen
+                            @elseif(now()->gt($windowSelesai))
+                                Waktu presensi hari ini sudah berakhir
+                            @else
+                                Tersedia pukul {{ $windowMulai->format('H:i') }} - {{ $windowSelesai->format('H:i') }} WITA
+                            @endif
+                        </p>
+                    </div>
                 </div>
             </button>
             @endunless
             @if($sudahMasuk && !$sudahPulang)
-            <button type="button" id="btn-trigger-pulang" class="p-5 rounded-2xl border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 cursor-pointer transition active:scale-98 text-left">
+            <button type="button" id="btn-trigger-pulang" data-tipe="pulang" class="p-5 rounded-2xl border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 cursor-pointer transition active:scale-98 text-left">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-600/20"><i class="fa-solid fa-person-walking-arrow-right"></i></div>
                     <div><p class="text-sm font-bold text-blue-800">Presensi Pulang</p><p class="text-[11px] text-blue-600">Klik untuk ambil swafoto & pulang</p></div>
@@ -177,9 +195,40 @@ $(function () {
     let webcamStream = null;
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
-    setInterval(function () {
-        $('#live-clock').text(new Date().toLocaleTimeString('id-ID') + ' WITA');
-    }, 1000);
+    // Selisih jam server vs jam perangkat, supaya tidak tergantung jam HP/laptop user
+    const SERVER_OFFSET = {{ $serverNowMs }} - Date.now();
+    const serverNow = function () { return Date.now() + SERVER_OFFSET; };
+
+    // ===== Jendela waktu tombol Presensi Masuk =====
+    function cekJendelaPresensi() {
+        const $btn = $('#btn-trigger-absen');
+        if (!$btn.length) return;
+
+        const now = serverNow();
+        const mulai = Number($btn.data('mulai'));
+        const selesai = Number($btn.data('selesai'));
+        const libur = String($btn.data('off')) === '1';
+        const label = $btn.data('label');
+        const aktif = !libur && now >= mulai && now <= selesai;
+
+        $btn.prop('disabled', !aktif);
+
+        let teks;
+        if (libur) teks = 'Hari ini libur, presensi tidak diperlukan';
+        else if (aktif) teks = 'Klik untuk ambil swafoto & absen';
+        else if (now > selesai) teks = 'Waktu presensi hari ini sudah berakhir';
+        else teks = 'Tersedia pukul ' + label + ' WITA';
+        $('#info-jendela-masuk').text(teks);
+    }
+
+    function tickClock() {
+        $('#live-clock').text(
+            new Date(serverNow()).toLocaleTimeString('id-ID', { timeZone: 'Asia/Makassar', hour12: false }) + ' WITA'
+        );
+        cekJendelaPresensi();
+    }
+    setInterval(tickClock, 1000);
+    tickClock();
 
     function triggerGPS(callback) {
         if (!navigator.geolocation) {
@@ -263,7 +312,16 @@ $(function () {
         startCamera();
     }
     function closeModal() { $('#modal-absen').addClass('hidden').removeClass('flex'); stopCamera(); }
-    $('#btn-trigger-absen, #btn-trigger-pulang').click(function () { if ($(this).prop('disabled')) return; openModal($(this).data('tipe') || 'masuk'); });
+
+    $('#btn-trigger-absen, #btn-trigger-pulang').click(function () {
+        if ($(this).prop('disabled')) return;
+        // Cek ulang jendela waktu untuk presensi masuk sebelum modal dibuka
+        if ($(this).attr('id') === 'btn-trigger-absen') {
+            cekJendelaPresensi();
+            if ($(this).prop('disabled')) return;
+        }
+        openModal($(this).data('tipe') || 'masuk');
+    });
     $('#btn-close-modal').click(closeModal);
 
     $('#btn-snap-modal').click(function () {
@@ -311,4 +369,3 @@ $(function () {
 });
 </script>
 @endpush
-

@@ -59,6 +59,10 @@ class AbsensiController extends Controller
         // Pengajuan dispensasi terbaru
         $pengajuanLain = $user->pengajuanLainnya()->orderByDesc('created_at')->limit(3)->get();
 
+        [$windowMulai, $windowSelesai] = $user->jendelaPresensiMasuk($today);
+        $sekarang = now();
+        $bisaPresensiMasuk = !$isShiftOff && $sekarang->between($windowMulai, $windowSelesai);
+
         return view('karyawan.absen', [
             'user' => $user,
             'logMasuk' => $logMasuk,
@@ -72,6 +76,10 @@ class AbsensiController extends Controller
             'kuota' => $kuota,
             'totalCutiPending' => $totalCutiPending,
             'pengajuanLain' => $pengajuanLain,
+            'windowMulai'       => $windowMulai,
+            'windowSelesai'     => $windowSelesai,
+            'bisaPresensiMasuk' => $bisaPresensiMasuk,
+            'serverNowMs'       => $sekarang->getTimestampMs(),
         ]);
     }
 }
