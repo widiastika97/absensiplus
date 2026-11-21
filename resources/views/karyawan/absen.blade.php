@@ -79,6 +79,8 @@
                 data-mulai="{{ $windowMulai->getTimestampMs() }}"
                 data-bisa="{{ $bisaPresensiMasuk }}"
                 data-selesai="{{ $windowSelesai->getTimestampMs() }}"
+                data-selesai-ori="{{ $windowSelesai }}"
+                data-mulai-ori="{{ $windowMulai }}"
                 data-label="{{ $windowMulai->format('H:i') }} - {{ $windowSelesai->format('H:i') }}"
                 data-off="{{ $isShiftOff ? '1' : '0' }}"
                 @disabled(!$bisaPresensiMasuk)
