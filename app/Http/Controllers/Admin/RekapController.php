@@ -86,6 +86,13 @@ class RekapController extends Controller
             ->get()
             ->keyBy(fn ($c) => $c->tanggal->toDateString());
 
+        // Roster shift tercatat (menentukan hari kerja/libur karyawan, termasuk hari Minggu)
+        $rosterMap = \App\Models\JadwalShiftKaryawan::with('shift')
+            ->where('karyawan_id', $karyawanId)
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->get()
+            ->keyBy(fn ($r) => $r->tanggal->toDateString());
+
         // Statistik kehadiran bulan ini
         $stats = ['hadir' => 0, 'tepat_waktu' => 0, 'terlambat' => 0, 'cuti' => 0, 'libur' => 0];
         $today = now()->toDateString();
@@ -95,12 +102,15 @@ class RekapController extends Controller
                 continue;
             }
             $masuk = $presensi->get($tglStr)?->firstWhere('tipe', 'masuk');
+            $rosterTgl = $rosterMap->get($tglStr);
             if ($masuk) {
                 $stats['hadir']++;
                 $masuk->status === 'terlambat' ? $stats['terlambat']++ : $stats['tepat_waktu']++;
             } elseif ($this->cutiPada($tglStr, $cutiList)) {
                 $stats['cuti']++;
-            } elseif ($this->liburPada($tglStr, $liburList) || (int) date('N', strtotime($tglStr)) === 7) {
+            } elseif ($this->liburPada($tglStr, $liburList)
+                || ($rosterTgl && $rosterTgl->shift->is_off)
+                || ((int) date('N', strtotime($tglStr)) === 7 && !$rosterTgl)) {
                 $stats['libur']++;
             }
         }
@@ -115,6 +125,7 @@ class RekapController extends Controller
             'liburList' => $liburList,
             'cutiList' => $cutiList,
             'catatanMap' => $catatanMap,
+            'rosterMap' => $rosterMap,
             'stats' => $stats,
             'prev' => $prev,
             'next' => $next,

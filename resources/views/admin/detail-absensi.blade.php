@@ -25,6 +25,7 @@
         $isWeekendDay = ($dayOfWeek == 7);
         $liburTgl = $liburList->first(fn ($l) => $curDate >= $l->tanggal_mulai->toDateString() && $curDate <= $l->tanggal_selesai->toDateString());
         $cutiTgl = $cutiList->first(fn ($c) => $curDate >= $c->tanggal_mulai->toDateString() && $curDate <= $c->tanggal_selesai->toDateString());
+        $rosterTgl = $rosterMap->get($curDate);
         $masukHari = $presensi->get($curDate)?->firstWhere('tipe', 'masuk');
         if ($masukHari) {
             $totalHadir++;
@@ -32,7 +33,7 @@
             else $totalTerlambat++;
         } elseif ($cutiTgl) {
             $totalCuti++;
-        } elseif ($liburTgl || $isWeekendDay) {
+        } elseif ($liburTgl || ($rosterTgl && $rosterTgl->shift->is_off) || ($isWeekendDay && !$rosterTgl)) {
             $totalLibur++;
         }
     }
@@ -214,6 +215,11 @@
                     $cutiRow = $cutiList->first(fn ($c) => $dateStr >= $c->tanggal_mulai->toDateString() && $dateStr <= $c->tanggal_selesai->toDateString());
                     $cutiName = $cutiRow ? ($cutiRow->label_tipe ?: $cutiRow->tipe_cuti) : null;
                     $catatanAdmin = $catatanMap->get($dateStr)?->catatan;
+                    // Roster karyawan menentukan hari kerja/libur (bukan asumsi hari Minggu)
+                    $rosterItem = $rosterMap->get($dateStr);
+                    $rosterOff = $rosterItem && $rosterItem->shift->is_off;
+                    $rosterNama = $rosterItem?->shift->nama_shift;
+                    $weekendLibur = $isWeekend && !$rosterItem;
 
                     // Tentukan style border dan background kotak
                     $cardClass = "bg-white border-slate-200 hover:border-blue-400 hover:shadow-md";
@@ -232,7 +238,10 @@
                     } elseif ($liburName) {
                         $cardClass = "bg-amber-50/40 border-amber-200 hover:border-amber-400 hover:shadow-md";
                         $badgeHtml = '<span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 truncate block">Libur: ' . e($liburName) . '</span>';
-                    } elseif ($isWeekend) {
+                    } elseif ($rosterOff) {
+                        $cardClass = "bg-amber-50/40 border-amber-200 hover:border-amber-400 hover:shadow-md";
+                        $badgeHtml = '<span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 truncate block">Libur: ' . e($rosterNama) . '</span>';
+                    } elseif ($weekendLibur) {
                         $cardClass = "bg-slate-100/50 border-slate-200";
                         $badgeHtml = '<span class="text-[10px] text-slate-400 italic">Akhir Pekan</span>';
                     } elseif (!$isFuture) {
