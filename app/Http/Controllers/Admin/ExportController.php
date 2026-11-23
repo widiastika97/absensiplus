@@ -121,6 +121,11 @@ class ExportController extends Controller
             ->whereDate('tanggal', '<=', $tanggalSelesai)
             ->orderBy('tanggal')->get(['karyawan_id', 'tanggal', 'catatan']);
 
+        // Estimasi lebar matriks (px): kolom identitas 540 + 4 rekap 180 + kolom tanggal ~46px + margin
+        $jumlahTanggal = count($daftarTanggal);
+        $estimasiLebar = 760 + 46 * $jumlahTanggal;
+        $printZoom = min(1, round(1040 / $estimasiLebar, 2));
+
         return [
             'daftarTanggal' => $daftarTanggal,
             'karyawanList' => $karyawanList,
@@ -132,6 +137,7 @@ class ExportController extends Controller
             'tanggal_selesai' => $tanggalSelesai,
             'today' => now()->toDateString(),
             'isPrint' => false,
+            'printZoom' => $printZoom,
         ];
     }
 }

@@ -3,6 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Rekapitulasi Presensi {{ $tanggal_mulai }} s/d {{ $tanggal_selesai }}</title>
+    @if(!empty($isPrint))
+    <style>
+        /* Landscape + fit-to-width agar matriks tidak terpotong di sisi kanan */
+        @page { size: A4 landscape; margin: 6mm; }
+        html { zoom: {{ $printZoom }}; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        /* Ulangi header tabel di tiap halaman & jangan membelah baris */
+        thead { display: table-header-group; }
+        tr { page-break-inside: avoid; }
+        table { page-break-inside: auto; }
+        th, td { padding: 3px 2px !important; }
+    </style>
+    @endif
 </head>
 <body>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; font-family: Calibri, Arial, sans-serif; font-size: 11px;">
