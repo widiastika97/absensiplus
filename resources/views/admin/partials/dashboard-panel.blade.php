@@ -1,5 +1,5 @@
     <!-- Statistik -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6" style="gap:24px">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
@@ -94,7 +94,7 @@
             <p class="text-[11px] text-slate-300 mt-1">Coba ubah rentang tanggal atau departemen</p>
         </div>
         @else
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" style="gap:20px">
             @foreach($presensiHariIni as $row)
             <div class="p-4 rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition group">
                 <div class="flex items-center gap-3">
@@ -356,7 +356,7 @@
     <!-- TAB: Rekap & Ekspor -->
     <div id="tab-laporan" class="tab-content hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
         <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-file-export text-emerald-600"></i> Rekapitulasi & Ekspor Laporan</h2>
-        <form method="GET" action="{{ route('admin.rekap') }}" class="grid grid-cols-2 sm:grid-cols-4 gap-5">
+        <form method="GET" action="{{ route('admin.rekap') }}" class="grid grid-cols-2 sm:grid-cols-4 gap-5" style="gap:20px">
             <div>
                 <label class="text-[11px] font-bold text-slate-600">Bulan</label>
                 <select name="bulan" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
