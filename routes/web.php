@@ -83,6 +83,7 @@ Route::middleware('auth:karyawan')->group(function () {
 */
 Route::middleware(['auth:karyawan', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('ajax/dashboard-data', [DashboardController::class, 'ajaxData'])->name('ajax.dashboard-data');
 
     // AJAX CRUD
     Route::post('ajax/crud-karyawan', CrudKaryawanController::class)

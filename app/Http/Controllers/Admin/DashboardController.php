@@ -10,6 +10,7 @@ use App\Models\LokasiKantor;use App\Models\PengajuanLainnya;
 use App\Models\Pengaturan;
 use App\Models\Presensi;
 use App\Models\Role;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -18,7 +19,21 @@ class DashboardController extends Controller
 {
     public function index(Request $request): View
     {
-        $user = Auth::guard('karyawan')->user();
+        return view('admin.dashboard', $this->dashboardData($request) + [
+            'user' => Auth::guard('karyawan')->user(),
+        ]);
+    }
+
+    // Data dashboard untuk refresh partial AJAX (tanpa reload halaman)
+    public function ajaxData(Request $request): JsonResponse
+    {
+        return response()->json([
+            'html' => view('admin.partials.dashboard-panel', $this->dashboardData($request))->render(),
+        ]);
+    }
+
+    private function dashboardData(Request $request): array
+    {
         $today = now()->toDateString();
 
         $stats = [
@@ -153,8 +168,7 @@ class DashboardController extends Controller
             ];
         })->values();
 
-        return view('admin.dashboard', [
-            'user' => $user,
+        return [
             'stats' => $stats,
             'logDari' => $logDari,
             'logSampai' => $logSampai,
@@ -180,6 +194,6 @@ class DashboardController extends Controller
             'allDispensasiList' => $allDispensasiList,
             'kuotaRekap' => $kuotaRekap,
             'filterTanggal' => $request->query('tanggal', $today),
-        ]);
+        ];
     }
 }
