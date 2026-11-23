@@ -117,7 +117,7 @@
     <thead>
         <tr>
             <th colspan="3" style="background-color: #b45309; color: #fff; text-align: left; padding: 7px; font-size: 11px;">
-                <i>Catatan Admin (Sistem Eror / Karyawan Lupa Absen)</i>
+                <i>Catatan Admin</i>
             </th>
         </tr>
         <tr>

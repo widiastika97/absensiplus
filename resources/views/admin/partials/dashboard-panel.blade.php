@@ -151,7 +151,7 @@
                 </div>
                 @endif
                 <button type="button" onclick="editCatatanAbsen({{ $row->karyawan_id }}, '{{ $row->nama }}', '{{ \Illuminate\Support\Carbon::parse($row->log_tanggal)->toDateString() }}', '')" class="mt-2 w-full py-1.5 rounded-xl border border-dashed border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-[10px] font-bold text-slate-400 hover:text-blue-600 transition cursor-pointer">
-                    <i class="fa-solid fa-plus"></i> Catatan Admin (Sistem Eror / Lupa Absen)
+                    <i class="fa-solid fa-plus"></i> Catatan Admin
                 </button>
             </div>
             @endforeach
