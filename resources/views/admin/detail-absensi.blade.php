@@ -33,7 +33,7 @@
             else $totalTerlambat++;
         } elseif ($cutiTgl) {
             $totalCuti++;
-        } elseif ($liburTgl || ($rosterTgl && $rosterTgl->shift->is_off) || ($isWeekendDay && !$rosterTgl)) {
+        } elseif ($liburTgl || ($rosterTgl && $rosterTgl->shift->is_off)) {
             $totalLibur++;
         }
     }
@@ -215,11 +215,11 @@
                     $cutiRow = $cutiList->first(fn ($c) => $dateStr >= $c->tanggal_mulai->toDateString() && $dateStr <= $c->tanggal_selesai->toDateString());
                     $cutiName = $cutiRow ? ($cutiRow->label_tipe ?: $cutiRow->tipe_cuti) : null;
                     $catatanAdmin = $catatanMap->get($dateStr)?->catatan;
-                    // Roster karyawan menentukan hari kerja/libur (bukan asumsi hari Minggu)
+                    // Libur HANYA dari shift off / jadwal libur — Minggu bukan libur otomatis
                     $rosterItem = $rosterMap->get($dateStr);
                     $rosterOff = $rosterItem && $rosterItem->shift->is_off;
                     $rosterNama = $rosterItem?->shift->nama_shift;
-                    $weekendLibur = $isWeekend && !$rosterItem;
+                    $weekendLibur = false;
 
                     // Tentukan style border dan background kotak
                     $cardClass = "bg-white border-slate-200 hover:border-blue-400 hover:shadow-md";
@@ -241,9 +241,6 @@
                     } elseif ($rosterOff) {
                         $cardClass = "bg-amber-50/40 border-amber-200 hover:border-amber-400 hover:shadow-md";
                         $badgeHtml = '<span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 truncate block">Libur: ' . e($rosterNama) . '</span>';
-                    } elseif ($weekendLibur) {
-                        $cardClass = "bg-slate-100/50 border-slate-200";
-                        $badgeHtml = '<span class="text-[10px] text-slate-400 italic">Akhir Pekan</span>';
                     } elseif (!$isFuture) {
                         $cardClass = "bg-rose-50/20 border-rose-200 hover:border-rose-300 hover:shadow-md";
                         $badgeHtml = '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-700">Tidak Hadir</span>';
@@ -438,7 +435,7 @@ function bukaModalDetailTanggal(data) {
         bannerHtml = '<i class="fa-solid fa-umbrella-beach text-amber-600 text-base"></i> <span class="text-amber-800">Hari Libur Terjadwal: <strong>' + data.libur_name + '</strong>.</span>';
         $('#modalBannerStatus').attr('class', 'p-3 rounded-2xl border text-xs font-medium flex items-center gap-2 bg-amber-50 border-amber-200 text-amber-800');
     } else if (data.is_weekend) {
-        bannerHtml = '<i class="fa-solid fa-bed text-slate-500 text-base"></i> <span class="text-slate-600">Hari Libur Akhir Pekan (Minggu).</span>';
+        bannerHtml = '<i class="fa-solid fa-circle-info text-slate-500 text-base"></i> <span class="text-slate-600">Hari Minggu — status hari ini ditentukan oleh shift roster karyawan.</span>';
         $('#modalBannerStatus').attr('class', 'p-3 rounded-2xl border text-xs font-medium flex items-center gap-2 bg-slate-100 border-slate-200 text-slate-700');
     } else {
         bannerHtml = '<i class="fa-solid fa-circle-xmark text-rose-600 text-base"></i> <span class="text-rose-800">Tidak ada catatan presensi yang terekam pada tanggal ini.</span>';

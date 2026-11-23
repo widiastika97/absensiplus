@@ -27,7 +27,7 @@ class AbsensiController extends Controller
         $logMasuk = $logsHariIni->firstWhere('tipe', 'masuk');
         $logPulang = $logsHariIni->firstWhere('tipe', 'pulang');
 
-        // Roster shift hari ini, fallback default (Senin-Sabtu 08:00-17:00, Minggu off)
+        // Roster shift hari ini, fallback default (jam kerja 08:00-17:00, tanpa asumsi Minggu off)
         $rosterHariIni = $user->shiftHariIni($today)?->load('shift');
 
         if ($rosterHariIni) {
@@ -35,9 +35,9 @@ class AbsensiController extends Controller
             $isShiftOff = $rosterHariIni->shift->is_off;
             $isNightShift = $rosterHariIni->shift->is_night_shift;
         } else {
-            $isSunday = (int) now()->format('N') === 7;
-            $namaShiftAktif = $isSunday ? 'Libur Roster (OFF)' : 'Normal Office (08:00 - 17:00 WITA)';
-            $isShiftOff = $isSunday;
+            // Tanpa roster: hari kerja default (tidak ada lagi asumsi "Minggu = libur")
+            $namaShiftAktif = 'Normal Office (08:00 - 17:00 WITA)';
+            $isShiftOff = false;
             $isNightShift = false;
         }
 

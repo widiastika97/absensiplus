@@ -125,16 +125,7 @@ class SimpanAbsenController extends Controller
 
             $jamBatasMasuk = $rosterHariIni->shift->jam_masuk;
         } else {
-            // Default tanpa roster: Minggu = libur (day off)
-            if ((int) now()->format('N') === 7) {
-                Storage::disk('public')->delete('selfie/'.$fileName);
-
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Hari ini adalah hari Minggu (Libur Roster / Day Off). Tidak perlu melakukan presensi.',
-                ]);
-            }
-
+            // Tanpa roster: bukan libur otomatis (libur hanya dari shift off / jadwal libur)
             $defShift = MasterShift::where('is_off', 0)->orderBy('id')->first();
             $jamBatasMasuk = $defShift?->jam_masuk ?? '08:00:00';
         }

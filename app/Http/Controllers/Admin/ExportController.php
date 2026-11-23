@@ -116,6 +116,17 @@ class ExportController extends Controller
                 }
             });
 
+        // Hari off dari roster shift per karyawan (sumber libur selain jadwal libur)
+        $rosterOffMap = [];
+        \App\Models\JadwalShiftKaryawan::with('shift')
+            ->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai])
+            ->get()
+            ->each(function ($r) use (&$rosterOffMap) {
+                if ($r->shift && $r->shift->is_off) {
+                    $rosterOffMap[$r->karyawan_id][$r->tanggal->toDateString()] = true;
+                }
+            });
+
         // Catatan absensi admin (mis. sistem eror / lupa absen)
         $catatanList = CatatanAbsensi::whereDate('tanggal', '>=', $tanggalMulai)
             ->whereDate('tanggal', '<=', $tanggalSelesai)
@@ -132,6 +143,7 @@ class ExportController extends Controller
             'presensiMap' => $presensiMap,
             'cutiMap' => $cutiMap,
             'liburMap' => $liburMap,
+            'rosterOffMap' => $rosterOffMap,
             'catatanList' => $catatanList,
             'tanggal_mulai' => $tanggalMulai,
             'tanggal_selesai' => $tanggalSelesai,

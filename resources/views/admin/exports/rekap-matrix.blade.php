@@ -67,8 +67,8 @@
                     $masuk = $presensiMap[$kId][$tgl]['masuk'] ?? null;
                     $pulang = $presensiMap[$kId][$tgl]['pulang'] ?? null;
                     $hasAbsensi = ($masuk !== null || $pulang !== null);
-                    $isSunday = ((int) date('w', strtotime($tgl)) === 0);
                     $isLibur = isset($liburMap[$tgl]);
+                    $rosterOff = isset($rosterOffMap[$kId][$tgl]);
                     $isFuture = ($tgl > $today);
 
                     if ($hasAbsensi) {
@@ -92,7 +92,7 @@
                     } elseif ($isFuture) {
                         $cellStyle = 'background-color: #F8FAFC; color: #94A3B8;';
                         $cellText = '-';
-                    } elseif ($isSunday || $isLibur) {
+                    } elseif ($isLibur || $rosterOff) {
                         $cellStyle = 'background-color: #F1F5F9; color: #64748B; font-size: 10px;';
                         $cellText = 'LIBUR';
                     } else {

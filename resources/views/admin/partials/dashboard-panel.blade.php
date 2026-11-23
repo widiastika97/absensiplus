@@ -548,7 +548,7 @@
                         <span class="font-bold text-slate-800">Keterangan:</span>
                         <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-indigo-50 border border-indigo-300"></span> Shift Kerja Masuk</span>
                         <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-200 border border-slate-300"></span> Libur / Day Off</span>
-                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-100 border border-rose-300"></span> Hari Libur Akhir Pekan (Minggu)</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-100 border border-rose-300"></span> Hari Minggu (rotasi header kalender — status mengikuti roster)</span>
                     </div>
                 </div>
             </div>

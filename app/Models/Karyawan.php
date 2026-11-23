@@ -139,7 +139,7 @@ class Karyawan extends Authenticatable
     }
 
     /**
-     * Roster shift hari ini; fallback default 08:00-17:00 (Minggu = off).
+     * Roster shift hari ini; tanpa fallback "Minggu = off".
      */
     public function shiftHariIni(string $tanggal): ?JadwalShiftKaryawan
     {

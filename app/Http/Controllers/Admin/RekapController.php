@@ -116,9 +116,7 @@ class RekapController extends Controller
                 $masuk->status === 'terlambat' ? $stats['terlambat']++ : $stats['tepat_waktu']++;
             } elseif ($this->cutiPada($tglStr, $cutiList)) {
                 $stats['cuti']++;
-            } elseif ($this->liburPada($tglStr, $liburList)
-                || ($rosterTgl && $rosterTgl->shift->is_off)
-                || ((int) date('N', strtotime($tglStr)) === 7 && !$rosterTgl)) {
+            } elseif ($this->liburPada($tglStr, $liburList) || ($rosterTgl && $rosterTgl->shift->is_off)) {
                 $stats['libur']++;
             }
         }

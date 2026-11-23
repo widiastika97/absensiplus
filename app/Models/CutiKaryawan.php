@@ -69,9 +69,8 @@ class CutiKaryawan extends Model
         $end = new \DateTime($selesai);
 
         while ($curr <= $end) {
-            if ((int) $curr->format('N') !== 7) { // 7 = Minggu
-                $total++;
-            }
+            // Sudah tidak mengasumsikan Minggu libur; libur hanya menurut shift off / jadwal libur
+            $total++;
             $curr->modify('+1 day');
         }
 
