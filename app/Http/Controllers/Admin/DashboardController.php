@@ -80,6 +80,13 @@ class DashboardController extends Controller
             ->orderBy('karyawan.nama')
             ->get();
 
+        // Catatan absensi admin (sistem eror / lupa absen) dalam periode log
+        $catatanAbsensi = \App\Models\CatatanAbsensi::whereDate('tanggal', '>=', $logDari)
+            ->whereDate('tanggal', '<=', $logSampai)
+            ->orderBy('tanggal')
+            ->get()
+            ->groupBy('karyawan_id');
+
         $lokasiList = LokasiKantor::orderBy('id')->get();
 
         $departemenList = Karyawan::distinct()->orderBy('departemen')->pluck('departemen')->filter();
@@ -175,6 +182,7 @@ class DashboardController extends Controller
             'logDept' => $logDept,
             'departemenList' => $departemenList,
             'presensiHariIni' => $presensiHariIni,
+            'catatanAbsensi' => $catatanAbsensi,
             'lokasiList' => $lokasiList,
             'rolesList' => $rolesList,
             'karyawanList' => $karyawanList,

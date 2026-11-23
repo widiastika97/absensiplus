@@ -488,6 +488,25 @@ function resetPasswordKaryawan(id) {
     });
 }
 
+// Catatan absensi admin (sistem eror / karyawan lupa absen)
+function editCatatanAbsen(karyawanId, nama, tanggal, catatan) {
+    Swal.fire({
+        title: 'Catatan Absensi',
+        input: 'textarea',
+        inputLabel: nama + ' — ' + tanggal + ' (kosongkan untuk menghapus catatan)',
+        inputValue: catatan || '',
+        inputPlaceholder: 'cth: Sistem error / lupa absen, dihitung manual oleh admin.',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-save"></i> Simpan Catatan',
+        confirmButtonColor: '#2563eb',
+        cancelButtonText: 'Batal',
+    }).then((r) => {
+        if (r.isConfirmed) {
+            ajaxPost("{{ route('admin.ajax.catatan-absensi') }}", { karyawan_id: karyawanId, tanggal: tanggal, catatan: r.value || '' });
+        }
+    });
+}
+
 // ===== Cuti & dispensasi =====
 function approveCuti(id, action) {
     const doIt = (alasan = '') => ajaxPost("{{ route('admin.ajax.approve-cuti') }}", { cuti_id: id, action, alasan_penolakan: alasan });

@@ -328,16 +328,28 @@ $(function () {
     $('#btn-close-modal').click(closeModal);
 
     $('#btn-snap-modal').click(function () {
+        // Di beberapa browser mobile, video belum siap / metadata belum termuat
+        // saat tombol ditekan → canvas kosong → dataURL tidak valid (tampil "?").
+        if (!webcamStream || !video.videoWidth || !video.videoHeight) {
+            Swal.fire({ icon: 'warning', title: 'Kamera Belum Siap', text: 'Kamera sedang menyiapkan gambar. Tunggu sejenak lalu ambil foto lagi.' });
+            return;
+        }
         const canvas = document.getElementById('snapshot-canvas');
-        const size = Math.min(video.videoWidth || 480, video.videoHeight || 480);
+        const size = Math.min(video.videoWidth, video.videoHeight);
         canvas.width = size; canvas.height = size;
         const ctx = canvas.getContext('2d');
         ctx.translate(size, 0); ctx.scale(-1, 1);
-        const startX = ((video.videoWidth || 480) - size) / 2;
-        const startY = ((video.videoHeight || 480) - size) / 2;
+        const startX = (video.videoWidth - size) / 2;
+        const startY = (video.videoHeight - size) / 2;
         ctx.drawImage(video, startX, startY, size, size, 0, 0, size, size);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        capturedImage = canvas.toDataURL('image/jpeg', 0.88);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+        // Jaminan dataURL valid sebelum ditampilkan / dikirim
+        if (!dataUrl || dataUrl === 'data:,' || !/^data:image\/(jpeg|png);base64,/.test(dataUrl)) {
+            Swal.fire({ icon: 'error', title: 'Gagal Mengambil Foto', text: 'Kamera belum siap, silakan ulangi.' });
+            return;
+        }
+        capturedImage = dataUrl;
         $('#preview-photo').attr('src', capturedImage).removeClass('hidden');
         $(video).addClass('hidden'); $('#face-guide').addClass('hidden');
         $('#modal-snap-controls').addClass('hidden');
@@ -349,6 +361,8 @@ $(function () {
         $(video).removeClass('hidden'); $('#face-guide').removeClass('hidden');
         $('#modal-snap-controls').removeClass('hidden');
         $('#modal-submit-controls').addClass('hidden');
+        // Pastikan stream kamera tetap berjalan (khususnya di browser mobile)
+        if (video.paused) { video.play().catch(function () {}); }
     });
 
     $('#btn-submit-modal').click(function () {

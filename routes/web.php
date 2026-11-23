@@ -19,6 +19,7 @@ use App\Http\Controllers\Ajax\SimpanAbsenController;
 use App\Http\Controllers\Ajax\SubmitCutiController;
 use App\Http\Controllers\Ajax\SubmitPengajuanLainController;
 use App\Http\Controllers\Ajax\UpdateFotoProfilController;
+use App\Http\Controllers\Ajax\UpdateCatatanAbsensiController;
 use App\Http\Controllers\Ajax\UpdateSaldoCutiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Karyawan\AbsensiController;
@@ -102,6 +103,8 @@ Route::post('ajax/crud-shift', CrudShiftController::class)
         ->middleware('permission:admin_persetujuan_cuti')->name('ajax.approve-pengajuan-lain');
     Route::post('ajax/update-saldo-cuti', UpdateSaldoCutiController::class)
         ->middleware('permission:admin_persetujuan_cuti,admin_data_karyawan')->name('ajax.update-saldo-cuti');
+    Route::post('ajax/catatan-absensi', UpdateCatatanAbsensiController::class)
+        ->middleware('permission:admin_log_presensi,admin_data_karyawan')->name('ajax.catatan-absensi');
 
     // Master jadwal libur (full CRUD)
     Route::get('jadwal-libur', [JadwalLiburController::class, 'index'])

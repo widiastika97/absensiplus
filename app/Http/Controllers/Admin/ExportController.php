@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CutiKaryawan;
+use App\Models\CatatanAbsensi;
 use App\Models\JadwalLibur;
 use App\Models\Karyawan;
 use App\Models\Presensi;
@@ -115,12 +116,18 @@ class ExportController extends Controller
                 }
             });
 
+        // Catatan absensi admin (mis. sistem eror / lupa absen)
+        $catatanList = CatatanAbsensi::whereDate('tanggal', '>=', $tanggalMulai)
+            ->whereDate('tanggal', '<=', $tanggalSelesai)
+            ->orderBy('tanggal')->get(['karyawan_id', 'tanggal', 'catatan']);
+
         return [
             'daftarTanggal' => $daftarTanggal,
             'karyawanList' => $karyawanList,
             'presensiMap' => $presensiMap,
             'cutiMap' => $cutiMap,
             'liburMap' => $liburMap,
+            'catatanList' => $catatanList,
             'tanggal_mulai' => $tanggalMulai,
             'tanggal_selesai' => $tanggalSelesai,
             'today' => now()->toDateString(),

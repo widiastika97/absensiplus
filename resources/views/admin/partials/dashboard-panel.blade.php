@@ -136,6 +136,23 @@
                     <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 font-bold"><i class="fa-solid fa-medal"></i> Disiplin</span>
                     @endif
                 </div>
+                @php $catatanSaya = $catatanAbsensi->get($row->karyawan_id); @endphp
+                @if($catatanSaya && $catatanSaya->isNotEmpty())
+                <div class="mt-2 space-y-1">
+                    @foreach($catatanSaya as $ct)
+                    <div class="flex items-start gap-1.5 p-2 rounded-xl bg-amber-50 border border-amber-200 text-[10px] text-amber-800">
+                        <i class="fa-solid fa-file-lines mt-0.5 shrink-0"></i>
+                        <div class="min-w-0 flex-1">
+                            <span class="font-bold font-mono">{{ $ct->tanggal->translatedFormat('d M Y') }}</span> — <span class="break-words">{{ $ct->catatan }}</span>
+                        </div>
+                        <button type="button" onclick="editCatatanAbsen({{ $row->karyawan_id }}, '{{ $row->nama }}', '{{ $ct->tanggal->toDateString() }}', @js($ct->catatan))" class="shrink-0 w-6 h-6 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 flex items-center justify-center cursor-pointer" title="Edit catatan"><i class="fa-solid fa-pen text-[9px]"></i></button>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+                <button type="button" onclick="editCatatanAbsen({{ $row->karyawan_id }}, '{{ $row->nama }}', '{{ \Illuminate\Support\Carbon::parse($row->log_tanggal)->toDateString() }}', '')" class="mt-2 w-full py-1.5 rounded-xl border border-dashed border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-[10px] font-bold text-slate-400 hover:text-blue-600 transition cursor-pointer">
+                    <i class="fa-solid fa-plus"></i> Catatan Admin (Sistem Eror / Lupa Absen)
+                </button>
             </div>
             @endforeach
         </div>

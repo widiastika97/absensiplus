@@ -99,6 +99,35 @@
     </tbody>
 </table>
 
+@if(isset($catatanList) && $catatanList->isNotEmpty())
+<table border="0" cellpadding="4" cellspacing="0" style="margin-top: 18px; width: 100%; font-size: 10px;">
+    <thead>
+        <tr>
+            <th colspan="3" style="background-color: #b45309; color: #fff; text-align: left; padding: 7px; font-size: 11px;">
+                <i>Catatan Admin (Sistem Eror / Karyawan Lupa Absen)</i>
+            </th>
+        </tr>
+        <tr>
+            <th style="background-color: #fef3c7; text-align: left; width: 180px; padding: 5px;">Tanggal</th>
+            <th style="background-color: #fef3c7; text-align: left; width: 220px; padding: 5px;">Nama Karyawan</th>
+            <th style="background-color: #fef3c7; text-align: left; padding: 5px;">Catatan</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($catatanList as $ct)
+        @php
+            $kCat = $karyawanList->firstWhere('id', $ct->karyawan_id);
+        @endphp
+        <tr>
+            <td style="padding: 5px; mso-number-format:'@';">{{ \Illuminate\Support\Carbon::parse($ct->tanggal)->translatedFormat('d M Y') }}</td>
+            <td style="padding: 5px;">{{ $kCat?->nama ?? ('ID '.$ct->karyawan_id) }}</td>
+            <td style="padding: 5px; color: #92400e;">{{ $ct->catatan }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+@endif
+
 @if(!empty($isPrint))
 <script>
     window.onload = function () { window.print(); };
