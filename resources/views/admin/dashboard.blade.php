@@ -661,14 +661,17 @@ function openModalGenerate() {
                 const pola = $('#gen-pola').val();
                 const maxOff = OFF_LIMIT[pola];
                 // Pola rotasi & 2p2s2m2off memakai aturan hari libur sendiri (scripted)
-                const pakaiPilihanHari = maxOff !== null && maxOff !== undefined;
+                const pakaiPilihanHari = maxOff !== null && maxOff !== undefined && maxOff > 0;
                 $('#wrap-gen-hari-off').toggle(pakaiPilihanHari);
                 $('#gen-max-off').text(maxOff || 0);
                 if (pakaiPilihanHari) {
                     initSelect2(maxOff);
+                    $sel.prop('disabled', false);
                     $sel.val(DEFAULT_OFF[pola] || []).trigger('change');
                 } else {
-                    $sel.val([]).trigger('change');
+                    // 7 hari kerja / pola scripted: matikan & kosongkan pilihan hari libur
+                    if ($sel.hasClass('select2-hidden-accessible')) $sel.select2('destroy');
+                    $sel.prop('disabled', true).val([]).trigger('change');
                 }
             };
             $('#gen-pola').off('change.genPola').on('change.genPola', syncOffControls);
