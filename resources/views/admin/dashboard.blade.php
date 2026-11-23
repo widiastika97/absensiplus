@@ -222,11 +222,14 @@ function refreshRegion(extra = {}) {
         roster_tahun: $('#panel-region select[name="roster_tahun"]').val(),
     };
     const merged = Object.assign(params, extra);
+    // simpan posisi scroll kalender roster agar tidak kembali ke awal setelah refresh
+    const rosterScroll = { left: $('#roster-matrix-wrap').scrollLeft(), top: $('#roster-matrix-wrap').scrollTop() };
     return $.get("{{ route('admin.ajax.dashboard-data') }}", merged)
         .done((res) => {
             $('#panel-region').html(res.html);
             aktifkanTab(sessionStorage.getItem('dashboard.activeTab') || 'tab-logs');
             filterRosterKaryawan();
+            $('#roster-matrix-wrap').scrollLeft(rosterScroll.left).scrollTop(rosterScroll.top);
             const q = $.param({ dari: merged.dari, sampai: merged.sampai, dept: merged.dept, roster_bulan: merged.roster_bulan, roster_tahun: merged.roster_tahun });
             history.replaceState(null, '', `{{ route('admin.dashboard') }}?${q}${location.hash || ''}`);
         })

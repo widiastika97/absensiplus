@@ -470,7 +470,7 @@
                     </div>
 
                     <!-- Matrix Table -->
-                    <div class="overflow-x-auto custom-scroll rounded-2xl border border-slate-200">
+                    <div id="roster-matrix-wrap" class="overflow-x-auto custom-scroll rounded-2xl border border-slate-200">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead class="bg-slate-100/90 text-slate-700 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
                                 <tr>
