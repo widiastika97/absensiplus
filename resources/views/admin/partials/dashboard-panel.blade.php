@@ -142,8 +142,7 @@
                     @foreach($catatanSaya as $ct)
                 <div class="flex items-start gap-1.5 p-2 rounded-full bg-gradient-to-r from-amber-100 to-yellow-50 border border-amber-200/70 text-[10px] text-amber-700 shadow-sm">
                     <i class="fa-solid fa-file-lines mt-0.5 shrink-0"></i>
-                        <i class="fa-solid fa-file-lines mt-0.5 shrink-0"></i>
-                        <div class="min-w-0 flex-1">
+                    <div class="min-w-0 flex-1">
                             <span class="font-bold font-mono">{{ $ct->tanggal->translatedFormat('d M Y') }}</span> — <span class="break-words">{{ $ct->catatan }}</span>
                         </div>
                         <button type="button" onclick="editCatatanAbsen({{ $row->karyawan_id }}, '{{ $row->nama }}', '{{ $ct->tanggal->toDateString() }}', @js($ct->catatan))" class="shrink-0 w-6 h-6 rounded-full bg-amber-100/80 hover:bg-amber-200 text-amber-600 flex items-center justify-center cursor-pointer" title="Edit catatan"><i class="fa-solid fa-pen text-[9px]"></i></button>
