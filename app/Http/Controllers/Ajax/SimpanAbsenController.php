@@ -57,7 +57,17 @@ class SimpanAbsenController extends Controller
         }
 
         $fileName = 'selfie_'.$karyawanId.'_'.now()->format('Ymd_His').'_'.uniqid().'.jpg';
-        Storage::disk('public')->put('selfie/'.$fileName, $imageBinary);
+
+        if (! Storage::disk('public')->exists('selfie')) {
+            Storage::disk('public')->makeDirectory('selfie');
+        }
+
+        if (! Storage::disk('public')->put('selfie/'.$fileName, $imageBinary)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan foto selfie ke server (izin folder storage tidak cukup). Hubungi administrator.',
+            ]);
+        }
 
         // 3. Cegah dobel absen & validasi absen pulang
         $today = now()->toDateString();

@@ -426,7 +426,7 @@ $('#form-lokasi').on('submit', function (e) {
     const id = $('#lokasi-id').val();
     const data = Object.fromEntries(new FormData(this).entries());
     data.action = id ? 'edit' : 'tambah';
-    ajaxPost("{{ route('admin.ajax.crud-lokasi') }}", data);
+    ajaxPost("{{ route('admin.ajax.crud-lokasi') }}", data, () => { closeModalLokasi(); $('#form-lokasi')[0].reset(); });
 });
 
 function hapusLokasi(id) {
@@ -462,7 +462,7 @@ $('#form-karyawan').on('submit', function (e) {
     const data = Object.fromEntries(new FormData(this).entries());
     data.action = id ? 'edit' : 'tambah';
     if (id) delete data.password;
-    ajaxPost("{{ route('admin.ajax.crud-karyawan') }}", data);
+    ajaxPost("{{ route('admin.ajax.crud-karyawan') }}", data, () => { closeModalKaryawan(); $('#form-karyawan')[0].reset(); });
 });
 
 function hapusKaryawan(id) {
@@ -699,7 +699,7 @@ $('#form-shift').on('submit', function (e) {
     data.is_night_shift = $('#shift-night').prop('checked') ? 1 : 0;
     data.is_off = $('#shift-off').prop('checked') ? 1 : 0;
     if (id) data.id = id;
-    ajaxPost("{{ route('admin.ajax.crud-shift') }}", data);
+    ajaxPost("{{ route('admin.ajax.crud-shift') }}", data, () => { tutupModalShift(); $('#form-shift')[0].reset(); });
 });
 
 function hapusShift(id) {
@@ -815,7 +815,7 @@ $('#form-role').on('submit', function (e) {
         izin_akses: JSON.stringify(perms),
     };
     if (id) data.id = id; else data.kode_role = $('#role-kode').val();
-    ajaxPost("{{ route('admin.ajax.crud-role') }}", data);
+    ajaxPost("{{ route('admin.ajax.crud-role') }}", data, () => { tutupModalRole(); $('#form-role')[0].reset(); });
 });
 </script>
 @endpush

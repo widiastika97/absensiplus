@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CatatanAbsensi;
 use App\Models\CutiKaryawan;
 use App\Models\JadwalLibur;
 use App\Models\Karyawan;
@@ -78,6 +79,13 @@ class RekapController extends Controller
                     ->orWhereBetween('tanggal_selesai', [$startDate, $endDate]);
             })->get();
 
+        // Catatan admin (sistem eror / karyawan lupa absen) per tanggal
+        $catatanMap = CatatanAbsensi::where('karyawan_id', $karyawanId)
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->orderBy('tanggal')
+            ->get()
+            ->keyBy(fn ($c) => $c->tanggal->toDateString());
+
         // Statistik kehadiran bulan ini
         $stats = ['hadir' => 0, 'tepat_waktu' => 0, 'terlambat' => 0, 'cuti' => 0, 'libur' => 0];
         $today = now()->toDateString();
@@ -106,6 +114,7 @@ class RekapController extends Controller
             'presensi' => $presensi,
             'liburList' => $liburList,
             'cutiList' => $cutiList,
+            'catatanMap' => $catatanMap,
             'stats' => $stats,
             'prev' => $prev,
             'next' => $next,

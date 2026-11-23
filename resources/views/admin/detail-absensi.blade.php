@@ -1,5 +1,15 @@
 @extends('layouts.admin')
 
+@push('head')
+<style>
+    /* Pastikan warna & catatan tercetak saat "Cetak Rekap" */
+    @media print {
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        @page { size: A4 landscape; margin: 8mm; }
+    }
+</style>
+@endpush
+
 @section('title', 'Kalender Detail Absensi - ' . $karyawan->nama . ' (' . \Carbon\Carbon::create(null, $bulan)->translatedFormat('F Y') . ')')
 
 @php
@@ -203,6 +213,7 @@
                     $liburName = $liburList->first(fn ($l) => $dateStr >= $l->tanggal_mulai->toDateString() && $dateStr <= $l->tanggal_selesai->toDateString())?->nama_libur;
                     $cutiRow = $cutiList->first(fn ($c) => $dateStr >= $c->tanggal_mulai->toDateString() && $dateStr <= $c->tanggal_selesai->toDateString());
                     $cutiName = $cutiRow ? ($cutiRow->label_tipe ?: $cutiRow->tipe_cuti) : null;
+                    $catatanAdmin = $catatanMap->get($dateStr)?->catatan;
 
                     // Tentukan style border dan background kotak
                     $cardClass = "bg-white border-slate-200 hover:border-blue-400 hover:shadow-md";
@@ -241,6 +252,7 @@
                         'is_weekend' => $isWeekend,
                         'libur_name' => $liburName,
                         'cuti_name' => $cutiName,
+                        'catatan_admin' => $catatanAdmin,
                         'masuk' => $logMasuk ? [
                             'jam' => $logMasuk->jam,
                             'status' => $logMasuk->status,
@@ -272,6 +284,13 @@
                     <div class="my-1 text-center">
                         {!! $badgeHtml !!}
                     </div>
+
+                    @if($catatanAdmin)
+                    <div class="mt-1 px-1.5 py-0.5 rounded-md bg-yellow-100 border border-yellow-300 text-[9px] text-yellow-800 flex items-start gap-1 print-visible">
+                        <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                        <span class="font-semibold leading-tight break-words">Catatan: {{ \Illuminate\Support\Str::limit($catatanAdmin, 60) }}</span>
+                    </div>
+                    @endif
 
                     <div class="text-[11px] font-mono text-slate-600 space-y-0.5 border-t border-slate-100 pt-1">
                         @if($hasMasuk)
@@ -314,6 +333,13 @@
 
         <!-- Status Banner Hari Itu (Libur / Cuti / Masuk) -->
         <div id="modalBannerStatus" class="p-3 rounded-2xl border text-xs font-medium flex items-center gap-2"></div>
+        <div id="modalCatatanAdmin" class="hidden p-3 rounded-2xl border text-xs font-medium flex items-start gap-2 bg-yellow-50 border-yellow-300 text-yellow-800">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+            <div>
+                <p class="font-bold">Catatan Admin</p>
+                <p id="modalCatatanAdminText" class="leading-relaxed break-words"></p>
+            </div>
+        </div>
 
         <!-- 2 Kolom Absensi: Masuk & Pulang -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -410,6 +436,15 @@ function bukaModalDetailTanggal(data) {
         $('#modalBannerStatus').attr('class', 'p-3 rounded-2xl border text-xs font-medium flex items-center gap-2 bg-rose-50 border-rose-200 text-rose-800');
     }
     $('#modalBannerStatus').html(bannerHtml);
+
+    // Tampilkan catatan admin (jika ada) pada tanggal ini
+    if (data.catatan_admin) {
+        $('#modalCatatanAdminText').text(data.catatan_admin);
+        $('#modalCatatanAdmin').removeClass('hidden');
+    } else {
+        $('#modalCatatanAdminText').text('');
+        $('#modalCatatanAdmin').addClass('hidden');
+    }
 
     if (data.masuk) {
         $('#textJamMasuk').text(data.masuk.jam.substring(0, 5) + ' WITA');
