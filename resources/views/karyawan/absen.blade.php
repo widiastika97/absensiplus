@@ -30,7 +30,7 @@
             <div class="flex flex-col gap-1">
                 <p class="text-xs sm:text-sm font-bold text-emerald-700 flex items-center gap-1.5"><i class="fa-solid fa-arrow-right-to-bracket"></i> {{ $logMasuk ? 'Bukti Masuk — '.substr($logMasuk->jam,0,5).' WITA' : 'Bukti Masuk — belum' }}</p>
                 @if($logMasuk && $logMasuk->foto_selfie)
-                <img src="/storage/selfie/{{ $logMasuk->foto_selfie }}" onclick="perbesarFoto(this.src)" class="w-full aspect-square rounded-xl border border-slate-200 cursor-pointer hover:opacity-90 transition shadow-sm object-cover" alt="Swafoto masuk">
+                <img src="{{ route('storage.selfie', $logMasuk->foto_selfie) }}" onclick="perbesarFoto(this.src)" class="w-full aspect-square rounded-xl border border-slate-200 cursor-pointer hover:opacity-90 transition shadow-sm object-cover" alt="Swafoto masuk">
                 @else
                 <div class="w-full aspect-square rounded-xl bg-gradient-to-br from-slate-100 to-emerald-50 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400">
                     <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-2"><i class="fa-solid fa-user text-2xl text-emerald-500"></i></div>
@@ -42,7 +42,7 @@
             <div class="flex flex-col gap-1">
                 <p class="text-xs sm:text-sm font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-arrow-right-from-bracket"></i> {{ $logPulang ? 'Bukti Pulang — '.substr($logPulang->jam,0,5).' WITA' : 'Bukti Pulang — belum' }}</p>
                 @if($logPulang && $logPulang->foto_selfie)
-                <img src="/storage/selfie/{{ $logPulang->foto_selfie }}" onclick="perbesarFoto(this.src)" class="w-full aspect-square rounded-xl border border-slate-200 cursor-pointer hover:opacity-90 transition shadow-sm object-cover" alt="Swafoto pulang">
+                <img src="{{ route('storage.selfie', $logPulang->foto_selfie) }}" onclick="perbesarFoto(this.src)" class="w-full aspect-square rounded-xl border border-slate-200 cursor-pointer hover:opacity-90 transition shadow-sm object-cover" alt="Swafoto pulang">
                 @else
                 <div class="w-full aspect-square rounded-xl bg-gradient-to-br from-slate-100 to-blue-50 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400">
                     <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-2"><i class="fa-solid fa-camera text-2xl text-blue-500"></i></div>

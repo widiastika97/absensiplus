@@ -76,10 +76,10 @@
                         @endif
                     </div>
                     @if($masuk && $masuk->foto_selfie)
-                        <img src="{{ asset('storage/selfie/' . $masuk->foto_selfie) }}"
+                        <img src="{{ route('storage.selfie', $masuk->foto_selfie) }}"
                              onerror="this.src='https://ui-avatars.com/api/?name=?&size=64';"
                              class="w-14 h-14 rounded-xl object-cover border border-slate-200 cursor-pointer hover:opacity-80"
-                             onclick="previewSelfie('{{ asset('storage/selfie/' . $masuk->foto_selfie) }}')">
+                             onclick="previewSelfie('{{ route('storage.selfie', $masuk->foto_selfie) }}')">
                     @endif
                 </div>
             </div>

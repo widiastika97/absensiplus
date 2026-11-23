@@ -409,7 +409,7 @@ function resolveSelfieUrl(foto) {
     if (foto.startsWith('http://') || foto.startsWith('https://') || foto.startsWith('data:')) return foto;
     // Baris seeder memakai nama file dummy (teks, bukan file asli) → langsung pakai panel kosong
     if (!foto.match(/\.(jpg|jpeg|png|webp)$/i)) return '';
-    return '/storage/selfie/' + foto;
+    return '/foto-selfie/' + foto;
 }
 
 function bukaModalDetailTanggal(data) {

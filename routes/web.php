@@ -27,6 +27,7 @@ use App\Http\Controllers\Karyawan\PengajuanCutiController;
 use App\Http\Controllers\Karyawan\ProfilController;
 use App\Http\Controllers\Karyawan\RiwayatController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,13 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:karyawan')->group(function () {
+    // Streaming foto selfie (menghindari konflik folder fisik storage/ pada docroot sub-direktori hosting)
+    Route::get('foto-selfie/{file}', function (string $file) {
+        abort_unless(preg_match('/^[A-Za-z0-9._-]+$/', $file), 404);
+        $path = Storage::disk('public')->path('selfie/'.$file);
+        abort_unless(is_file($path), 404);
+        return response()->file($path, ['Cache-Control' => 'private, max-age=86400']);
+    })->name('storage.selfie');
     // Presensi (geofence + selfie)
     Route::get('absen', [AbsensiController::class, 'index'])->name('absen');
 
