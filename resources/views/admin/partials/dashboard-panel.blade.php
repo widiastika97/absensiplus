@@ -1,5 +1,5 @@
     <!-- Statistik -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
@@ -94,7 +94,7 @@
             <p class="text-[11px] text-slate-300 mt-1">Coba ubah rentang tanggal atau departemen</p>
         </div>
         @else
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             @foreach($presensiHariIni as $row)
             <div class="p-4 rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition group">
                 <div class="flex items-center gap-3">
@@ -356,7 +356,7 @@
     <!-- TAB: Rekap & Ekspor -->
     <div id="tab-laporan" class="tab-content hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
         <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-file-export text-emerald-600"></i> Rekapitulasi & Ekspor Laporan</h2>
-        <form method="GET" action="{{ route('admin.rekap') }}" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <form method="GET" action="{{ route('admin.rekap') }}" class="grid grid-cols-2 sm:grid-cols-4 gap-5">
             <div>
                 <label class="text-[11px] font-bold text-slate-600">Bulan</label>
                 <select name="bulan" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
@@ -379,7 +379,7 @@
                 <button type="submit" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold cursor-pointer">Lihat Rekap</button>
             </div>
         </form>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-3">
             <a href="{{ route('admin.export.excel', ['bulan' => now()->month, 'tahun' => now()->year]) }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer"><i class="fa-solid fa-file-excel"></i> Unduh Excel</a>
             <a href="{{ route('admin.export.pdf', ['bulan' => now()->month, 'tahun' => now()->year]) }}" target="_blank" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold cursor-pointer"><i class="fa-solid fa-file-pdf"></i> Unduh PDF (Print)</a>
         </div>
