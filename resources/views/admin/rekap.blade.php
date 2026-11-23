@@ -37,6 +37,7 @@
                         <th class="p-3">Lokasi Kantor</th>
                         <th class="p-3">Jarak</th>
                         <th class="p-3">Status</th>
+                        <th class="p-3">Catatan Admin</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -53,9 +54,19 @@
                         <td class="p-3">
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $row->status === 'tepat_waktu' ? 'bg-emerald-500/20 text-emerald-700' : 'bg-amber-500/20 text-amber-700' }}">{{ strtoupper($row->status) }}</span>
                         </td>
+                        @php $catatanRow = $catatanMap->get($row->karyawan_id.'_'.$row->tanggal->toDateString()); @endphp
+                        <td class="p-3">
+                            @if($catatanRow)
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-100 to-yellow-50 border border-amber-200/70 text-[10px] font-semibold text-amber-700 shadow-sm" title="Dicatat oleh {{ $catatanRow->admin_name }}">
+                                <i class="fa-solid fa-file-lines"></i> {{ $catatanRow->catatan }}
+                            </span>
+                            @else
+                            <span class="text-slate-300">-</span>
+                            @endif
+                        </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="p-10 text-center text-slate-400 italic">Tidak ada data presensi pada periode ini.</td></tr>
+                    <tr><td colspan="7" class="p-10 text-center text-slate-400 italic">Tidak ada data presensi pada periode ini.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -29,12 +29,20 @@ class RekapController extends Controller
 
         $departemenList = Karyawan::distinct()->orderBy('departemen')->pluck('departemen');
 
+        // Catatan admin (sistem eror / karyawan lupa absen) per karyawan+tanggal
+        $catatanMap = CatatanAbsensi::whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->orderBy('tanggal')
+            ->get()
+            ->keyBy(fn ($c) => $c->karyawan_id.'_'.$c->tanggal->toDateString());
+
         return view('admin.rekap', [
             'rekap' => $rekap,
             'bulan' => $bulan,
             'tahun' => $tahun,
             'dept' => $dept,
             'departemenList' => $departemenList,
+            'catatanMap' => $catatanMap,
         ]);
     }
 
