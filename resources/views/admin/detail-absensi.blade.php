@@ -286,8 +286,8 @@
                     </div>
 
                     @if($catatanAdmin)
-                    <div class="mt-1 px-1.5 py-0.5 rounded-md bg-yellow-100 border border-yellow-300 text-[9px] text-yellow-800 flex items-start gap-1 print-visible">
-                        <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                    <div class="mt-1.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-100 to-yellow-50 border border-amber-200/70 text-[9px] text-amber-700 shadow-sm print-visible">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
                         <span class="font-semibold leading-tight break-words">Catatan: {{ \Illuminate\Support\Str::limit($catatanAdmin, 60) }}</span>
                     </div>
                     @endif
@@ -333,7 +333,7 @@
 
         <!-- Status Banner Hari Itu (Libur / Cuti / Masuk) -->
         <div id="modalBannerStatus" class="p-3 rounded-2xl border text-xs font-medium flex items-center gap-2"></div>
-        <div id="modalCatatanAdmin" class="hidden p-3 rounded-2xl border text-xs font-medium flex items-start gap-2 bg-yellow-50 border-yellow-300 text-yellow-800">
+        <div id="modalCatatanAdmin" class="hidden p-3.5 rounded-2xl border text-xs font-medium flex items-start gap-2.5 bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200 text-amber-700 shadow-sm">
             <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
             <div>
                 <p class="font-bold">Catatan Admin</p>
