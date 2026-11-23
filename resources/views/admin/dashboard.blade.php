@@ -591,7 +591,7 @@ function openModalGenerate() {
                 <div><label class="gen-label">Bulan</label><select id="gen-bulan" class="swal2-input gen-in">@for($i = 1; $i <= 12; $i++) <option value="{{ $i }}" {{ $i === now()->month ? 'selected' : '' }}>{{ \Carbon\Carbon::create(null, $i)->translatedFormat('F') }}</option> @endfor</select></div>
                 <div><label class="gen-label">Tahun</label><input id="gen-tahun" type="number" value="{{ now()->year }}" min="2024" max="2030" class="swal2-input gen-in"></div>
                 <div><label class="gen-label">Shift Pagi/Kerja</label><select id="gen-shift-pagi" class="swal2-input gen-in">@foreach($shiftsListJS->where('is_off', 0) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
-                <div><label class="gen-label">Shift Off</label><select id="gen-shift-off" class="swal2-input gen-in">@foreach($shiftsListJS->where('is_off', 1) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
+                <div><label class="gen-label">Shift Off</label><select id="gen-shift-off" class="swal2-input gen-in"><option value="">— Terbuka (Masuk Tiap Hari) —</option>@foreach($shiftsListJS->where('is_off', 1) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
             </div>
             <div class="gen-sec">
                 <div>

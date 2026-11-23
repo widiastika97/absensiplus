@@ -127,12 +127,14 @@ class CrudShiftController extends Controller
         $pola = $request->input('pola', '6_1');
 
         $defaultOfficeId = MasterShift::where('is_off', 0)->orderBy('id')->value('id') ?: 1;
-        $defaultOffId = MasterShift::where('is_off', 1)->orderBy('id')->value('id') ?: 5;
 
         $shiftPagiId = (int) $request->input('shift_pagi_id', $defaultOfficeId);
         $shiftSiangId = (int) $request->input('shift_siang_id', 2);
         $shiftMalamId = (int) $request->input('shift_malam_id', 3);
-        $shiftOffId = (int) $request->input('shift_off_id', $defaultOffId);
+        // Shift Off boleh dikosongkan: artinya karyawan masuk setiap hari (slot off memakai shift kerja)
+        $shiftOffId = filled($request->input('shift_off_id'))
+            ? (int) $request->input('shift_off_id')
+            : null;
 
         $karyawanIds = $request->input('karyawan_ids', 'all');
         $jenis = in_array($request->input('jenis', 'semua'), ['tetap', 'kontrak'], true)
@@ -176,12 +178,12 @@ class CrudShiftController extends Controller
                 $targetShiftId = $shiftPagiId;
 
                 if ($pola === '6_1') {
-                    $targetShiftId = ($dayOfWeek === 7) ? $shiftOffId : $shiftPagiId;
+                    $targetShiftId = ($dayOfWeek === 7 && $shiftOffId) ? $shiftOffId : $shiftPagiId;
                 } elseif ($pola === '5_2') {
-                    $targetShiftId = ($dayOfWeek >= 6) ? $shiftOffId : $shiftPagiId;
+                    $targetShiftId = ($dayOfWeek >= 6 && $shiftOffId) ? $shiftOffId : $shiftPagiId;
                 } elseif ($pola === 'rotasi_pagi_siang') {
                     $weekNum = (int) date('W', strtotime($tglStr));
-                    $targetShiftId = ($dayOfWeek === 7)
+                    $targetShiftId = ($dayOfWeek === 7 && $shiftOffId)
                         ? $shiftOffId
                         : ($weekNum % 2 === 0 ? $shiftPagiId : $shiftSiangId);
                 } elseif ($pola === '2p_2s_2m_2off') {
@@ -190,7 +192,8 @@ class CrudShiftController extends Controller
                         $cycleIndex < 2 => $shiftPagiId,
                         $cycleIndex < 4 => $shiftSiangId,
                         $cycleIndex < 6 => $shiftMalamId,
-                        default => $shiftOffId,
+                        $shiftOffId !== null => $shiftOffId,
+                        default => $shiftPagiId,
                     };
                 }
 
