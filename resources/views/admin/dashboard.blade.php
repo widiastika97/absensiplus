@@ -568,8 +568,8 @@ function openModalGenerate() {
                 </div>
                 <div><label class="gen-label">Bulan</label><select id="gen-bulan" class="swal2-input gen-in">@for($i = 1; $i <= 12; $i++) <option value="{{ $i }}" {{ $i === now()->month ? 'selected' : '' }}>{{ \Carbon\Carbon::create(null, $i)->translatedFormat('F') }}</option> @endfor</select></div>
                 <div><label class="gen-label">Tahun</label><input id="gen-tahun" type="number" value="{{ now()->year }}" min="2024" max="2030" class="swal2-input gen-in"></div>
-                <div><label class="gen-label">Shift Pagi/Kerja</label><select id="gen-shift-pagi" class="swal2-input gen-in">@foreach($shiftsList->where('is_off', 0) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
-                <div><label class="gen-label">Shift Off</label><select id="gen-shift-off" class="swal2-input gen-in">@foreach($shiftsList->where('is_off', 1) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
+                <div><label class="gen-label">Shift Pagi/Kerja</label><select id="gen-shift-pagi" class="swal2-input gen-in">@foreach($shiftsListJS->where('is_off', 0) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
+                <div><label class="gen-label">Shift Off</label><select id="gen-shift-off" class="swal2-input gen-in">@foreach($shiftsListJS->where('is_off', 1) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
             </div>
             <div class="gen-sec">
                 <div>
@@ -666,7 +666,7 @@ function openModalAssign(empId, tanggal) {
     const karyawanOpts = [];
     @foreach($karyawanList as $k) karyawanOpts.push({ id: {{ $k->id }}, t: '{{ $k->nama }} ({{ $k->nip }})' }); @endforeach
     const shiftOpts = [];
-    @foreach($shiftsList as $s) shiftOpts.push({ id: {{ $s->id }}, t: '{{ $s->kode_shift }} • {{ $s->nama_shift }}' }); @endforeach
+    @foreach($shiftsListJS as $s) shiftOpts.push({ id: {{ $s->id }}, t: '{{ $s->kode_shift }} • {{ $s->nama_shift }}' }); @endforeach
 
     Swal.fire({
         title: 'Assign Roster Satu Tanggal',
