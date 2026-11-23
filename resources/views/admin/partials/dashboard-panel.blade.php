@@ -1,6 +1,6 @@
     <!-- Statistik -->
-    <div class="grid grid-cols-2 lg:grid-cols-4" style="padding:8px">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition" style="padding:16px;margin:10px">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" style="margin-bottom: 16px;">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Karyawan</p>
@@ -10,7 +10,7 @@
                 <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-users"></i></div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition" style="padding:16px;margin:10px">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hadir Hari Ini</p>
@@ -22,7 +22,7 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-user-check"></i></div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition" style="padding:16px;margin:10px">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Terlambat Hari Ini</p>
@@ -32,7 +32,7 @@
                 <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-user-clock"></i></div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition" style="padding:16px;margin:10px">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lokasi Aktif</p>
@@ -45,7 +45,7 @@
     </div>
 
     <!-- Tab Navigation -->
-    <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-1 overflow-x-auto text-xs font-semibold" id="admin-tabs">
+    <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-1 overflow-x-auto text-xs font-semibold" id="admin-tabs" style="margin-bottom: 16px;">
         <button data-tab="tab-logs" class="px-4 py-2 rounded-xl bg-slate-900 text-white whitespace-nowrap cursor-pointer">Log Absensi</button>
         <button data-tab="tab-lokasi" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 whitespace-nowrap cursor-pointer">Titik Kantor</button>
         <button data-tab="tab-karyawan" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 whitespace-nowrap cursor-pointer">Karyawan</button>
@@ -94,9 +94,9 @@
             <p class="text-[11px] text-slate-300 mt-1">Coba ubah rentang tanggal atau departemen</p>
         </div>
         @else
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" style="padding:8px">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
             @foreach($presensiHariIni as $row)
-            <div class="rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition group" style="padding:16px;margin:10px">
+            <div class="p-4 rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition group">
                 <div class="flex items-center gap-3">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode($row->nama) }}&background=e0e7ff&color=4338ca&size=64"
                         class="w-10 h-10 rounded-xl object-cover shrink-0" alt="">
@@ -356,8 +356,8 @@
     <!-- TAB: Rekap & Ekspor -->
     <div id="tab-laporan" class="tab-content hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
         <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-file-export text-emerald-600"></i> Rekapitulasi & Ekspor Laporan</h2>
-        <form method="GET" action="{{ route('admin.rekap') }}" class="grid grid-cols-2 sm:grid-cols-4">
-            <div style="margin:10px 12px">
+        <form method="GET" action="{{ route('admin.rekap') }}" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
                 <label class="text-[11px] font-bold text-slate-600">Bulan</label>
                 <select name="bulan" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                     @for($i = 1; $i <= 12; $i++)
@@ -365,21 +365,21 @@
                     @endfor
                 </select>
             </div>
-            <div style="margin:10px 12px">
+            <div>
                 <label class="text-[11px] font-bold text-slate-600">Tahun</label>
                 <input type="number" name="tahun" value="{{ now()->year }}" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
             </div>
-            <div style="margin:10px 12px">
+            <div>
                 <label class="text-[11px] font-bold text-slate-600">Departemen</label>
                 <select name="dept" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                     <option value="all">Semua</option>
                 </select>
             </div>
-            <div class="flex items-end" style="margin:10px 12px">
+            <div class="flex items-end gap-2">
                 <button type="submit" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold cursor-pointer">Lihat Rekap</button>
             </div>
         </form>
-        <div class="flex flex-wrap" style="gap:12px;margin-top:12px">
+        <div class="flex flex-wrap gap-2">
             <a href="{{ route('admin.export.excel', ['bulan' => now()->month, 'tahun' => now()->year]) }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer"><i class="fa-solid fa-file-excel"></i> Unduh Excel</a>
             <a href="{{ route('admin.export.pdf', ['bulan' => now()->month, 'tahun' => now()->year]) }}" target="_blank" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold cursor-pointer"><i class="fa-solid fa-file-pdf"></i> Unduh PDF (Print)</a>
         </div>
