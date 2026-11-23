@@ -131,10 +131,15 @@ class CrudShiftController extends Controller
         $shiftPagiId = (int) $request->input('shift_pagi_id', $defaultOfficeId);
         $shiftSiangId = (int) $request->input('shift_siang_id', 2);
         $shiftMalamId = (int) $request->input('shift_malam_id', 3);
-        // Shift Off boleh dikosongkan: artinya karyawan masuk setiap hari (slot off memakai shift kerja)
-        $shiftOffId = filled($request->input('shift_off_id'))
-            ? (int) $request->input('shift_off_id')
-            : null;
+        // Shift off memakai master shift libur (day off)
+        $shiftOffId = MasterShift::where('is_off', 1)->orderBy('id')->value('id') ?: 5;
+
+        // Hari libur bisa dipilih pola 6_1 (maks 1) & 5_2 (maks 2); default: 6_1 = Minggu, 5_2 = Sabtu+Minggu
+        $hariOffInput = collect((array) $request->input('hari_off'))
+            ->map(fn ($h) => (int) $h)
+            ->filter(fn ($h) => $h >= 1 && $h <= 7)
+            ->unique()
+            ->values();
 
         $karyawanIds = $request->input('karyawan_ids', 'all');
         $jenis = in_array($request->input('jenis', 'semua'), ['tetap', 'kontrak'], true)
@@ -177,13 +182,23 @@ class CrudShiftController extends Controller
                 $dayOfWeek = (int) date('N', strtotime($tglStr)); // 1 = Senin .. 7 = Minggu
                 $targetShiftId = $shiftPagiId;
 
-                if ($pola === '6_1') {
-                    $targetShiftId = ($dayOfWeek === 7 && $shiftOffId) ? $shiftOffId : $shiftPagiId;
+                if ($pola === '7_hari') {
+                    // 7 hari kerja: masuk setiap hari, libur diabaikan
+                    $targetShiftId = $shiftPagiId;
+                } elseif ($pola === '6_1') {
+                    // 1 hari libur, hari liburnya bisa dipilih (default: Minggu)
+                    $hariOff = $hariOffInput->take(1);
+                    $targetShiftId = ($hariOff->contains($dayOfWeek)) ? $shiftOffId : $shiftPagiId;
                 } elseif ($pola === '5_2') {
-                    $targetShiftId = ($dayOfWeek >= 6 && $shiftOffId) ? $shiftOffId : $shiftPagiId;
+                    // 2 hari libur, bisa dipilih (maks 2, default: Sabtu + Minggu)
+                    $hariOff = $hariOffInput->take(2);
+                    if ($hariOff->isEmpty()) {
+                        $hariOff = collect([6, 7]);
+                    }
+                    $targetShiftId = ($hariOff->contains($dayOfWeek)) ? $shiftOffId : $shiftPagiId;
                 } elseif ($pola === 'rotasi_pagi_siang') {
                     $weekNum = (int) date('W', strtotime($tglStr));
-                    $targetShiftId = ($dayOfWeek === 7 && $shiftOffId)
+                    $targetShiftId = ($dayOfWeek === 7)
                         ? $shiftOffId
                         : ($weekNum % 2 === 0 ? $shiftPagiId : $shiftSiangId);
                 } elseif ($pola === '2p_2s_2m_2off') {
@@ -192,8 +207,7 @@ class CrudShiftController extends Controller
                         $cycleIndex < 2 => $shiftPagiId,
                         $cycleIndex < 4 => $shiftSiangId,
                         $cycleIndex < 6 => $shiftMalamId,
-                        $shiftOffId !== null => $shiftOffId,
-                        default => $shiftPagiId,
+                        default => $shiftOffId,
                     };
                 }
 

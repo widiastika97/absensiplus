@@ -582,16 +582,24 @@ function openModalGenerate() {
                 <div class="full">
                     <label class="gen-label">Pola Roster</label>
                     <select id="gen-pola" class="swal2-input gen-in">
-                        <option value="6_1">6 Hari Kerja - 1 Off (Off Minggu)</option>
+                        <option value="7_hari">7 Hari Kerja (Masuk Tiap Hari)</option>
+                        <option value="6_1" selected>6 Hari Kerja - 1 Off</option>
                         <option value="5_2">5 Hari Kerja - 2 Off (Off Sabtu-Minggu)</option>
                         <option value="rotasi_pagi_siang">Rotasi Pagi/Siang per Minggu</option>
                         <option value="2p_2s_2m_2off">2 Pagi - 2 Siang - 2 Malam - 2 Off</option>
                     </select>
                 </div>
+                <div id="wrap-gen-hari-off">
+                    <label class="gen-label">Hari Libur (pilih maks. <span id="gen-max-off">1</span> hari)</label>
+                    <select id="gen-hari-off" multiple size="7" class="swal2-input gen-in">
+                        @foreach(['Senin'=>1,'Selasa'=>2,'Rabu'=>3,'Kamis'=>4,'Jumat'=>5,'Sabtu'=>6,'Minggu'=>7] as $nmHari => $noHari)
+                        <option value="{{ $noHari }}" {{ $noHari === 7 ? 'selected' : '' }}>{{ $nmHari }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div><label class="gen-label">Bulan</label><select id="gen-bulan" class="swal2-input gen-in">@for($i = 1; $i <= 12; $i++) <option value="{{ $i }}" {{ $i === now()->month ? 'selected' : '' }}>{{ \Carbon\Carbon::create(null, $i)->translatedFormat('F') }}</option> @endfor</select></div>
                 <div><label class="gen-label">Tahun</label><input id="gen-tahun" type="number" value="{{ now()->year }}" min="2024" max="2030" class="swal2-input gen-in"></div>
                 <div><label class="gen-label">Shift Pagi/Kerja</label><select id="gen-shift-pagi" class="swal2-input gen-in">@foreach($shiftsListJS->where('is_off', 0) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
-                <div><label class="gen-label">Shift Off</label><select id="gen-shift-off" class="swal2-input gen-in"><option value="">— Terbuka (Masuk Tiap Hari) —</option>@foreach($shiftsListJS->where('is_off', 1) as $s) <option value="{{ $s->id }}">{{ $s->kode_shift }} • {{ $s->nama_shift }}</option> @endforeach</select></div>
             </div>
             <div class="gen-sec">
                 <div>
@@ -610,18 +618,49 @@ function openModalGenerate() {
         customClass: { popup: 'rounded-3xl shadow-2xl' },
         preConfirm: () => {
             const karyawan = $('#gen-karyawan').val();
+            const pola = $('#gen-pola').val();
             return {
                 karyawan_all: karyawan,
                 jenis: $('#gen-jenis').val(),
-                pola: $('#gen-pola').val(),
+                pola: pola,
                 bulan: $('#gen-bulan').val(),
                 tahun: $('#gen-tahun').val(),
                 shift_pagi_id: $('#gen-shift-pagi').val(),
-                shift_off_id: $('#gen-shift-off').val(),
+                hari_off: pola === '7_hari' ? [] : ($('#gen-hari-off').val() || []),
                 karyawan_ids: karyawan === 'all' ? 'all' : [karyawan],
                 jam_masuk: $('#gen-jam-masuk').val(),
                 jam_pulang: $('#gen-jam-pulang').val(),
             };
+        },
+        didOpen: () => {
+            // Batasan hari libur per pola: 0 = tanpa libur (7 hari kerja), dsb.
+            const OFF_LIMIT = { '7_hari': 0, '6_1': 1, '5_2': 2, 'rotasi_pagi_siang': null, '2p_2s_2m_2off': null };
+            const DEFAULT_OFF = { '6_1': ['7'], '5_2': ['6', '7'] };
+
+            const syncOffControls = () => {
+                const pola = $('#gen-pola').val();
+                const maxOff = OFF_LIMIT[pola];
+                // Pola rotasi & 2p2s2m2off memakai aturan hari libur sendiri (scripted)
+                const pakaiPilihanHari = maxOff !== null && maxOff !== undefined;
+                $('#wrap-gen-hari-off').toggle(pakaiPilihanHari);
+                $('#gen-max-off').text(maxOff || 0);
+                const $sel = $('#gen-hari-off');
+                if (pakaiPilihanHari) {
+                    $sel.val(DEFAULT_OFF[pola] || []);
+                } else {
+                    $sel.val([]);
+                }
+                $sel.off('change.genOff').on('change.genOff', function () {
+                    const selected = $(this).val() || [];
+                    if (selected.length > maxOff) {
+                        // batasi jumlah hari libur sesuai maks pola terpilih
+                        $(this).val(selected.slice(-maxOff));
+                        Swal.fire({ icon: 'warning', title: 'Maksimal ' + maxOff + ' hari libur', text: 'Pola ini hanya mengizinkan ' + maxOff + ' hari libur.', timer: 1800, showConfirmButton: false });
+                    }
+                });
+            };
+            $('#gen-pola').off('change.genPola').on('change.genPola', syncOffControls);
+            syncOffControls();
         },
     }).then((result) => {
         if (result.isConfirmed && result.value) {
