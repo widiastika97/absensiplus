@@ -562,6 +562,11 @@ function openModalGenerate() {
                 .gen-label { display:block; text-align:left; font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:3px; }
                 .gen-sec h4 { font-size:11px; font-weight:800; color:#b45309; text-align:left; margin:6px 0 4px; }
                 .gen-sec { background:#fffbeb; border:1px solid #fde68a; border-radius:14px; padding:10px; margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:left; }
+                /* Select2 multi-select agar menyatu dengan tema modal */
+                .select2-container--default .select2-selection--multiple { border-radius: 10px; border-color: #cbd5e1; min-height: 36px; font-size: 12px; }
+                .select2-container--default.select2-container--focus .select2-selection--multiple { border-color: #6366f1; }
+                .select2-container--default .select2-selection--multiple .select2-selection__choice { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; font-weight: 600; font-size: 11px; }
+                .select2-dropdown { border-radius: 10px; font-size: 12px; }
             </style>
             <div class="gen-grid">
                 <div class="full">
@@ -636,6 +641,21 @@ function openModalGenerate() {
             // Batasan hari libur per pola: 0 = tanpa libur (7 hari kerja), dsb.
             const OFF_LIMIT = { '7_hari': 0, '6_1': 1, '5_2': 2, 'rotasi_pagi_siang': null, '2p_2s_2m_2off': null };
             const DEFAULT_OFF = { '6_1': ['7'], '5_2': ['6', '7'] };
+            const $sel = $('#gen-hari-off');
+
+            const initSelect2 = (maxOff) => {
+                if ($sel.hasClass('select2-hidden-accessible')) $sel.select2('destroy');
+                $sel.select2({
+                    width: '100%',
+                    dropdownParent: $('.swal2-popup'),
+                    placeholder: 'Pilih hari libur',
+                    closeOnSelect: false,
+                    maximumSelectionLength: maxOff || 0,
+                    language: {
+                        maximumSelected: () => 'Maksimal ' + maxOff + ' hari libur untuk pola ini',
+                    },
+                });
+            };
 
             const syncOffControls = () => {
                 const pola = $('#gen-pola').val();
@@ -644,20 +664,12 @@ function openModalGenerate() {
                 const pakaiPilihanHari = maxOff !== null && maxOff !== undefined;
                 $('#wrap-gen-hari-off').toggle(pakaiPilihanHari);
                 $('#gen-max-off').text(maxOff || 0);
-                const $sel = $('#gen-hari-off');
                 if (pakaiPilihanHari) {
-                    $sel.val(DEFAULT_OFF[pola] || []);
+                    initSelect2(maxOff);
+                    $sel.val(DEFAULT_OFF[pola] || []).trigger('change');
                 } else {
-                    $sel.val([]);
+                    $sel.val([]).trigger('change');
                 }
-                $sel.off('change.genOff').on('change.genOff', function () {
-                    const selected = $(this).val() || [];
-                    if (selected.length > maxOff) {
-                        // batasi jumlah hari libur sesuai maks pola terpilih
-                        $(this).val(selected.slice(-maxOff));
-                        Swal.fire({ icon: 'warning', title: 'Maksimal ' + maxOff + ' hari libur', text: 'Pola ini hanya mengizinkan ' + maxOff + ' hari libur.', timer: 1800, showConfirmButton: false });
-                    }
-                });
             };
             $('#gen-pola').off('change.genPola').on('change.genPola', syncOffControls);
             syncOffControls();
