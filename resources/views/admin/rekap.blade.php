@@ -9,15 +9,15 @@
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div>
             <h1 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-chart-column text-blue-600"></i> Laporan Rekap Bulanan Presensi
+                <i class="fa-solid fa-chart-column text-blue-600"></i> Laporan Rekap Presensi
             </h1>
-            <p class="text-[11px] text-slate-500 mt-0.5">Periode: {{ \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('F Y') }}@if($dept !== 'all') &bull; Departemen {{ $dept }}@endif</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Periode: {{ \Carbon\Carbon::parse($tanggalMulai)->translatedFormat('d M Y') }} — {{ \Carbon\Carbon::parse($tanggalSelesai)->translatedFormat('d M Y') }}@if($dept !== 'all') &bull; Departemen {{ $dept }}@endif</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('admin.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'dept' => $dept]) }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer">
+            <a href="{{ route('admin.export.excel', ['tanggal_mulai' => $tanggalMulai, 'tanggal_selesai' => $tanggalSelesai, 'dept' => $dept]) }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer">
                 <i class="fa-solid fa-file-excel"></i> Unduh Excel
             </a>
-            <a href="{{ route('admin.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'dept' => $dept]) }}" target="_blank" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold cursor-pointer">
+            <a href="{{ route('admin.export.pdf', ['tanggal_mulai' => $tanggalMulai, 'tanggal_selesai' => $tanggalSelesai, 'dept' => $dept]) }}" target="_blank" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold cursor-pointer">
                 <i class="fa-solid fa-file-pdf"></i> Unduh PDF
             </a>
             <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold cursor-pointer">
@@ -25,6 +25,26 @@
             </a>
         </div>
     </div>
+
+    @if($errors->any())
+    <div role="alert" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700">
+        {{ $errors->first() }}
+    </div>
+    @endif
+
+    <form method="GET" action="{{ route('admin.rekap') }}" class="flex flex-wrap items-end gap-3 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col gap-1">
+            <label for="tanggal_mulai" class="text-[10px] font-bold text-slate-400 uppercase">Tanggal Mulai</label>
+            <input id="tanggal_mulai" type="date" name="tanggal_mulai" value="{{ $tanggalMulai }}" required class="px-3 py-2 rounded-xl border border-slate-200 text-xs shadow-sm focus:ring-2 focus:ring-blue-200 outline-none">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="tanggal_selesai" class="text-[10px] font-bold text-slate-400 uppercase">Tanggal Selesai</label>
+            <input id="tanggal_selesai" type="date" name="tanggal_selesai" value="{{ $tanggalSelesai }}" required class="px-3 py-2 rounded-xl border border-slate-200 text-xs shadow-sm focus:ring-2 focus:ring-blue-200 outline-none">
+        </div>
+        <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/20 cursor-pointer transition active:scale-95">
+            <i class="fa-solid fa-filter"></i> Terapkan
+        </button>
+    </form>
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CatatanAbsensi;
 use App\Models\CutiKaryawan;
 use App\Models\JadwalLibur;
+use App\Models\JadwalShiftKaryawan;
 use App\Models\Karyawan;
 use App\Models\Presensi;
 use Illuminate\Http\Request;
@@ -15,13 +16,16 @@ class RekapController extends Controller
 {
     public function index(Request $request): View
     {
-        $bulan = (int) $request->query('bulan', now()->month);
-        $tahun = (int) $request->query('tahun', now()->year);
+        $dates = $request->validate([
+            'tanggal_mulai' => ['nullable', 'date_format:Y-m-d', 'required_with:tanggal_selesai'],
+            'tanggal_selesai' => ['nullable', 'date_format:Y-m-d', 'required_with:tanggal_mulai', 'after_or_equal:tanggal_mulai'],
+        ]);
+        $tanggalMulai = $dates['tanggal_mulai'] ?? now()->startOfMonth()->toDateString();
+        $tanggalSelesai = $dates['tanggal_selesai'] ?? now()->toDateString();
         $dept = $request->query('dept', 'all');
 
         $rekap = Presensi::with(['karyawan:id,nama,nip,departemen', 'lokasi:id,nama_lokasi'])
-            ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
+            ->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai])
             ->when($dept !== 'all', fn ($q) => $q->whereHas('karyawan', fn ($k) => $k->where('departemen', $dept)))
             ->orderByDesc('tanggal')
             ->orderBy('jam')
@@ -30,16 +34,15 @@ class RekapController extends Controller
         $departemenList = Karyawan::distinct()->orderBy('departemen')->pluck('departemen');
 
         // Catatan admin (sistem eror / karyawan lupa absen) per karyawan+tanggal
-        $catatanMap = CatatanAbsensi::whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
+        $catatanMap = CatatanAbsensi::whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai])
             ->orderBy('tanggal')
             ->get()
             ->keyBy(fn ($c) => $c->karyawan_id.'_'.$c->tanggal->toDateString());
 
         return view('admin.rekap', [
             'rekap' => $rekap,
-            'bulan' => $bulan,
-            'tahun' => $tahun,
+            'tanggalMulai' => $tanggalMulai,
+            'tanggalSelesai' => $tanggalSelesai,
             'dept' => $dept,
             'departemenList' => $departemenList,
             'catatanMap' => $catatanMap,
@@ -95,7 +98,7 @@ class RekapController extends Controller
             ->keyBy(fn ($c) => $c->tanggal->toDateString());
 
         // Roster shift tercatat (menentukan hari kerja/libur karyawan, termasuk hari Minggu)
-        $rosterMap = \App\Models\JadwalShiftKaryawan::with('shift')
+        $rosterMap = JadwalShiftKaryawan::with('shift')
             ->where('karyawan_id', $karyawanId)
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->get()

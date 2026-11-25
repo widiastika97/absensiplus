@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CutiKaryawan;
 use App\Models\CatatanAbsensi;
+use App\Models\CutiKaryawan;
 use App\Models\JadwalLibur;
+use App\Models\JadwalShiftKaryawan;
 use App\Models\Karyawan;
 use App\Models\Presensi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -43,8 +45,15 @@ class ExportController extends Controller
 
     private function buildMatrix(Request $request): array
     {
-        $tanggalMulai = $request->query('tanggal_mulai', $request->query('start_date', ''));
-        $tanggalSelesai = $request->query('tanggal_selesai', $request->query('end_date', ''));
+        $dates = Validator::make([
+            'tanggal_mulai' => $request->query('tanggal_mulai', $request->query('start_date')),
+            'tanggal_selesai' => $request->query('tanggal_selesai', $request->query('end_date')),
+        ], [
+            'tanggal_mulai' => ['nullable', 'date_format:Y-m-d', 'required_with:tanggal_selesai'],
+            'tanggal_selesai' => ['nullable', 'date_format:Y-m-d', 'required_with:tanggal_mulai', 'after_or_equal:tanggal_mulai'],
+        ])->validate();
+        $tanggalMulai = $dates['tanggal_mulai'] ?? '';
+        $tanggalSelesai = $dates['tanggal_selesai'] ?? '';
 
         // Backward compatibility: bulan & tahun
         if ($request->filled(['bulan', 'tahun']) && empty($tanggalMulai)) {
@@ -118,7 +127,7 @@ class ExportController extends Controller
 
         // Hari off dari roster shift per karyawan (sumber libur selain jadwal libur)
         $rosterOffMap = [];
-        \App\Models\JadwalShiftKaryawan::with('shift')
+        JadwalShiftKaryawan::with('shift')
             ->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai])
             ->get()
             ->each(function ($r) use (&$rosterOffMap) {
