@@ -13,6 +13,24 @@ class RekapDateRangeTest extends TestCase
 
     protected bool $seed = true;
 
+    public function test_dashboard_report_panel_uses_selected_dates_for_recap_and_exports(): void
+    {
+        $this->actingAs(Karyawan::findOrFail(1), 'karyawan');
+
+        $response = $this->get(route('admin.dashboard', [
+            'tanggal_mulai' => '2026-03-31',
+            'tanggal_selesai' => '2026-04-02',
+        ]));
+
+        $response->assertOk()
+            ->assertSee('name="tanggal_mulai"', false)
+            ->assertSee('value="2026-03-31"', false)
+            ->assertSee('name="tanggal_selesai"', false)
+            ->assertSee('value="2026-04-02"', false)
+            ->assertSee('formaction="'.route('admin.export.excel').'"', false)
+            ->assertSee('formaction="'.route('admin.export.pdf').'"', false);
+    }
+
     public function test_rekap_and_export_use_the_selected_inclusive_date_range(): void
     {
         $this->actingAs(Karyawan::findOrFail(1), 'karyawan');

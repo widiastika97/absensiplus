@@ -218,6 +218,8 @@ function refreshRegion(extra = {}) {
         dari: $('#tab-logs input[name="dari"]').val(),
         sampai: $('#tab-logs input[name="sampai"]').val(),
         dept: $('#tab-logs select[name="dept"]').val() || 'all',
+        tanggal_mulai: $('#tab-laporan input[name="tanggal_mulai"]').val(),
+        tanggal_selesai: $('#tab-laporan input[name="tanggal_selesai"]').val(),
         roster_bulan: $('#panel-region select[name="roster_bulan"]').val(),
         roster_tahun: $('#panel-region select[name="roster_tahun"]').val(),
     };
@@ -230,7 +232,7 @@ function refreshRegion(extra = {}) {
             aktifkanTab(sessionStorage.getItem('dashboard.activeTab') || 'tab-logs');
             filterRosterKaryawan();
             $('#roster-matrix-wrap').scrollLeft(rosterScroll.left).scrollTop(rosterScroll.top);
-            const q = $.param({ dari: merged.dari, sampai: merged.sampai, dept: merged.dept, roster_bulan: merged.roster_bulan, roster_tahun: merged.roster_tahun });
+            const q = $.param({ dari: merged.dari, sampai: merged.sampai, dept: merged.dept, tanggal_mulai: merged.tanggal_mulai, tanggal_selesai: merged.tanggal_selesai, roster_bulan: merged.roster_bulan, roster_tahun: merged.roster_tahun });
             history.replaceState(null, '', `{{ route('admin.dashboard') }}?${q}${location.hash || ''}`);
         })
         .fail(() => Swal.fire({icon:'error', title:'Gagal', text:'Gagal memuat data dashboard.'}));

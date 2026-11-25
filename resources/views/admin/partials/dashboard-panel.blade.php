@@ -356,33 +356,34 @@
     <!-- TAB: Rekap & Ekspor -->
     <div id="tab-laporan" class="tab-content hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
         <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-file-export text-emerald-600"></i> Rekapitulasi & Ekspor Laporan</h2>
-        <form method="GET" action="{{ route('admin.rekap') }}" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        @if($errors->has('tanggal_mulai') || $errors->has('tanggal_selesai'))
+        <div role="alert" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700">
+            {{ $errors->first('tanggal_mulai') ?: $errors->first('tanggal_selesai') }}
+        </div>
+        @endif
+        <form method="GET" action="{{ route('admin.rekap') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-                <label class="text-[11px] font-bold text-slate-600">Bulan</label>
-                <select name="bulan" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
-                    @for($i = 1; $i <= 12; $i++)
-                        <option value="{{ $i }}" {{ $i === now()->month ? 'selected' : '' }}>{{ \Carbon\Carbon::create(null, $i)->translatedFormat('F') }}</option>
-                    @endfor
-                </select>
+                <label for="laporan-tanggal-mulai" class="text-[11px] font-bold text-slate-600">Tanggal Mulai</label>
+                <input id="laporan-tanggal-mulai" type="date" name="tanggal_mulai" value="{{ request('tanggal_mulai', now()->startOfMonth()->toDateString()) }}" required class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
             </div>
             <div>
-                <label class="text-[11px] font-bold text-slate-600">Tahun</label>
-                <input type="number" name="tahun" value="{{ now()->year }}" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                <label for="laporan-tanggal-selesai" class="text-[11px] font-bold text-slate-600">Tanggal Selesai</label>
+                <input id="laporan-tanggal-selesai" type="date" name="tanggal_selesai" value="{{ request('tanggal_selesai', now()->toDateString()) }}" required class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
             </div>
             <div>
-                <label class="text-[11px] font-bold text-slate-600">Departemen</label>
-                <select name="dept" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                <label for="laporan-departemen" class="text-[11px] font-bold text-slate-600">Departemen</label>
+                <select id="laporan-departemen" name="dept" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                     <option value="all">Semua</option>
                 </select>
             </div>
             <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold cursor-pointer">Lihat Rekap</button>
+                <button type="submit" class="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold cursor-pointer transition active:scale-95">Lihat Rekap</button>
+            </div>
+            <div class="sm:col-span-2 lg:col-span-4 flex flex-wrap gap-2">
+                <button type="submit" formaction="{{ route('admin.export.excel') }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer transition active:scale-95"><i class="fa-solid fa-file-excel"></i> Unduh Excel</button>
+                <button type="submit" formaction="{{ route('admin.export.pdf') }}" formtarget="_blank" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold cursor-pointer transition active:scale-95"><i class="fa-solid fa-file-pdf"></i> Unduh PDF (Print)</button>
             </div>
         </form>
-        <div class="flex flex-wrap gap-2">
-            <a href="{{ route('admin.export.excel', ['bulan' => now()->month, 'tahun' => now()->year]) }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer"><i class="fa-solid fa-file-excel"></i> Unduh Excel</a>
-            <a href="{{ route('admin.export.pdf', ['bulan' => now()->month, 'tahun' => now()->year]) }}" target="_blank" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold cursor-pointer"><i class="fa-solid fa-file-pdf"></i> Unduh PDF (Print)</a>
-        </div>
     </div>
 
     <!-- TAB: Shift -->
