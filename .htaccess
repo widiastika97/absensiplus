@@ -12,9 +12,9 @@
     # The domain document root is the project root; Laravel's Vite output lives in public/build.
     RewriteRule ^build/(.*)$ public/build/$1 [L]
 
-    # Serve uploaded files directly from storage/app/public (shared hosting without /storage symlink)
+    # Serve uploaded files from storage/app/public when the domain root is the project root.
     RewriteCond %{REQUEST_URI} ^/storage/(.*)$
-    RewriteCond %{REQUEST_FILENAME}/../app/public/%1 -f
+    RewriteCond %{DOCUMENT_ROOT}/storage/app/public/%1 -f
     RewriteRule ^storage/(.*)$ storage/app/public/$1 [L]
 
     # Handle Authorization Header
